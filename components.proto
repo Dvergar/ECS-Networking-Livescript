@@ -1,0 +1,12 @@
+message CPosition
+{
+    required int32 x = 1;
+    required int32 y = 2;
+}
+
+message CDrawable
+{
+	optional string image_name = 1;
+	optional int32 width = 2;
+	optional int32 height = 3;
+}
