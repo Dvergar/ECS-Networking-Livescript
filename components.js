@@ -2,6 +2,42 @@ var _root = dcodeIO.ProtoBuf.newBuilder().import({
     "package": null,
     "messages": [
         {
+            "name": "CInput",
+            "fields": [
+                {
+                    "rule": "required",
+                    "type": "bool",
+                    "name": "key_up",
+                    "id": 1,
+                    "options": {}
+                },
+                {
+                    "rule": "required",
+                    "type": "bool",
+                    "name": "key_down",
+                    "id": 2,
+                    "options": {}
+                },
+                {
+                    "rule": "required",
+                    "type": "bool",
+                    "name": "key_left",
+                    "id": 2,
+                    "options": {}
+                },
+                {
+                    "rule": "required",
+                    "type": "bool",
+                    "name": "key_right",
+                    "id": 2,
+                    "options": {}
+                }
+            ],
+            "enums": [],
+            "messages": [],
+            "options": {}
+        },
+        {
             "name": "CPosition",
             "fields": [
                 {
@@ -46,9 +82,31 @@ var _root = dcodeIO.ProtoBuf.newBuilder().import({
                     "name": "height",
                     "id": 3,
                     "options": {}
+                },
+                {
+                    "rule": "required",
+                    "type": "Type",
+                    "name": "type",
+                    "id": 4,
+                    "options": {}
                 }
             ],
-            "enums": [],
+            "enums": [
+                {
+                    "name": "Type",
+                    "values": [
+                        {
+                            "name": "RECTANGLE",
+                            "id": 1
+                        },
+                        {
+                            "name": "IMAGE",
+                            "id": 2
+                        }
+                    ],
+                    "options": {}
+                }
+            ],
             "messages": [],
             "options": {}
         }

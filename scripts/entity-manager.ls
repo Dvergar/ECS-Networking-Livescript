@@ -1,11 +1,11 @@
 'use strict'
 
-# Load components from .proto
+# LOAD COMPONENTS FROM .PROTO
 components = dcodeIO.ProtoBuf
   .loadProtoFile \components.proto
   .build!
 
-# Associate IDs to components
+# ASSOCIATE IDS TO COMPONENTS
 numComponents = 0
 for componentName, componentType of components
     componentType.id = numComponents
@@ -17,8 +17,9 @@ class Entity
     @ids = 0
     code: 0
     components: [undefined] * numComponents
-    ->
-        @id = @@ids++
+
+    -> @id = @@ids++
+    get: (componentType) -> @components[componentType.id]
 
 
 class EntityManager
@@ -32,12 +33,14 @@ class EntityManager
         entity.code = entity.code .|. (1 .<<. component.id);
 
         for system in @systems
-            if system.code .&. entity.code is system.code
-                system.onEntityAdded entity
+            if (system.code .&. entity.code) is system.code
+                if system.entities[entity.id] is undefined
+                    system.entities[entity.id] = entity
+                    system.onEntityAdded entity
 
     removeComponent: (entity, component) ->
         for system in @systems
-            if system.code .&. entity.code is system.code
+            if (system.code .&. entity.code) is system.code
                 system.onEntityRemoved entity
 
         entity.code = entity.code .&. ~(1 .<<. component.id)

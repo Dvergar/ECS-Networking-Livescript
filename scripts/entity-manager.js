@@ -19,6 +19,9 @@
     function Entity(){
       this.id = constructor.ids++;
     }
+    prototype.get = function(componentType){
+      return this.components[componentType.id];
+    };
     return Entity;
   }());
   EntityManager = (function(){
@@ -34,8 +37,11 @@
       entity.code = entity.code | 1 << component.id;
       for (i$ = 0, len$ = (ref$ = this.systems).length; i$ < len$; ++i$) {
         system = ref$[i$];
-        if (system.code & entity.code === system.code) {
-          results$.push(system.onEntityAdded(entity));
+        if ((system.code & entity.code) === system.code) {
+          if (system.entities[entity.id] === undefined) {
+            system.entities[entity.id] = entity;
+            results$.push(system.onEntityAdded(entity));
+          }
         }
       }
       return results$;
@@ -44,7 +50,7 @@
       var i$, ref$, len$, system;
       for (i$ = 0, len$ = (ref$ = this.systems).length; i$ < len$; ++i$) {
         system = ref$[i$];
-        if (system.code & entity.code === system.code) {
+        if ((system.code & entity.code) === system.code) {
           system.onEntityRemoved(entity);
         }
       }

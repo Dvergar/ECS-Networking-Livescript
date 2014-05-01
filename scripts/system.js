@@ -7,25 +7,24 @@
     var prototype = System.prototype, constructor = System;
     System.ids = 0;
     prototype.code = 0;
-    prototype.entities = {};
-    function System(){
-      this.id = constructor.ids++;
-    }
     prototype.need = function(componentTypeList){
       var i$, len$, componentType;
+      this.id = constructor.ids++;
+      this.entities = {};
       for (i$ = 0, len$ = componentTypeList.length; i$ < len$; ++i$) {
         componentType = componentTypeList[i$];
         this.code = this.code | 1 << componentType.id;
       }
-      em.registerSystem(this);
-      return console.log("system code " + this.code);
+      return em.registerSystem(this);
     };
     prototype.onEntityAdded = function(entity){
       return console.log("An entity has been added but nothing has been catched");
     };
-    prototype.onComponentAdded = function(entity, component){
-      return console.log("A component " + component + " added but nothing has been catched");
+    prototype.onEntityRemoved = function(entity, component){
+      return console.log("An entity has been removed but nothing has been catched");
     };
+    prototype.loop = function(){};
+    function System(){}
     return System;
   }());
   out$.System = System;
