@@ -8,8 +8,6 @@ position = new CPosition
 drawable = new CDrawable
     ..imageName = "lel.png"
 
-console.log CPosition.id
-console.log CDrawable.id
 
 class DrawableSystem extends System
     drawables: {}
@@ -27,9 +25,6 @@ class PositionSystem extends System
     onEntityAdded: (entity) ->
         console.log "entity #entity has been added"
 
-    onComponentAdded: (entity, component) ->
-        if component.id is CPosition.id
-            console.log "x " + component.x
 
 new DrawableSystem
 new PositionSystem

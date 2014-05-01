@@ -8,8 +8,6 @@
   x$.y = 5;
   y$ = drawable = new CDrawable;
   y$.imageName = "lel.png";
-  console.log(CPosition.id);
-  console.log(CDrawable.id);
   DrawableSystem = (function(superclass){
     var prototype = extend$((import$(DrawableSystem, superclass).displayName = 'DrawableSystem', DrawableSystem), superclass).prototype, constructor = DrawableSystem;
     prototype.drawables = {};
@@ -28,11 +26,6 @@
     }
     prototype.onEntityAdded = function(entity){
       return console.log("entity " + entity + " has been added");
-    };
-    prototype.onComponentAdded = function(entity, component){
-      if (component.id === CPosition.id) {
-        return console.log("x " + component.x);
-      }
     };
     return PositionSystem;
   }(System));

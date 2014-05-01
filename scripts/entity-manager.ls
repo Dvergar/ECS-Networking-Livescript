@@ -13,36 +13,41 @@ for componentName, componentType of components
     window."#componentName" = componentType
 
 
+class Entity
+    @ids = 0
+    code: 0
+    components: [undefined] * numComponents
+    ->
+        @id = @@ids++
+
+
 class EntityManager
-    componentStore: [undefined] * numComponents
-    systems: [undefined] * numComponents
-    entityIds: 0
+    systems: []
 
     createEntity: ->
-        @entityIds++
+        new Entity
 
     addComponent: (entity, component) ->
-        store = @componentStore[component.id]
-        if store is undefined then @componentStore[component.id] = {}
-        @componentStore[component.id]."#entity" = component
-        console.log @componentStore
+        entity.components[component.id] = component
+        entity.code = entity.code .|. (1 .<<. component.id);
 
-        if @systems[component.id] isnt undefined
-            for system in @systems[component.id]
-                system._onComponentAdded(entity, component)
+        for system in @systems
+            if system.code .&. entity.code is system.code
+                system.onEntityAdded entity
+
+    removeComponent: (entity, component) ->
+        for system in @systems
+            if system.code .&. entity.code is system.code
+                system.onEntityRemoved entity
+
+        entity.code = entity.code .&. ~(1 .<<. component.id)
+        entity.components[component.id] = undefined
 
     getComponent: (entity, componentType) ->
-        store = @componentStore[componentType.id]
-        if store is undefined then throw new Error "No entity with that comp"
-        component = store."#entity"
-        if component is undefined then throw new Error "Nope component!"
-        return component
+        entity.components[componentType.id]
 
-    registerSystem: (system, componentTypeList) ->
-        for componentType in componentTypeList
-            if @systems[componentType.id] is undefined
-                @systems[componentType.id] = []
-            @systems[componentType.id].push system
+    registerSystem: (system) ->
+        @systems.push system
 
 
 export em = new EntityManager
