@@ -8,8 +8,9 @@ message CInput
 
 message CPosition
 {
-    required int32 x = 1;
-    required int32 y = 2;
+    required sint32 x = 1;
+    required sint32 y = 2;
+    required sint32 z = 3;
 }
 
 message CSpeed
@@ -22,7 +23,8 @@ message CDrawable
 	optional string image_name = 1;
 	optional int32 width = 2;
 	optional int32 height = 3;
-	required Type type = 4;
+    optional int32 color = 4;
+	required Type type = 5;
 
     enum Type
     {

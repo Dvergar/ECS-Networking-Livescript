@@ -22,14 +22,14 @@ var _root = dcodeIO.ProtoBuf.newBuilder().import({
                     "rule": "required",
                     "type": "bool",
                     "name": "key_left",
-                    "id": 2,
+                    "id": 3,
                     "options": {}
                 },
                 {
                     "rule": "required",
                     "type": "bool",
                     "name": "key_right",
-                    "id": 2,
+                    "id": 4,
                     "options": {}
                 }
             ],
@@ -42,17 +42,41 @@ var _root = dcodeIO.ProtoBuf.newBuilder().import({
             "fields": [
                 {
                     "rule": "required",
-                    "type": "int32",
+                    "type": "sint32",
                     "name": "x",
                     "id": 1,
                     "options": {}
                 },
                 {
                     "rule": "required",
-                    "type": "int32",
+                    "type": "sint32",
                     "name": "y",
                     "id": 2,
                     "options": {}
+                },
+                {
+                    "rule": "required",
+                    "type": "sint32",
+                    "name": "z",
+                    "id": 3,
+                    "options": {}
+                }
+            ],
+            "enums": [],
+            "messages": [],
+            "options": {}
+        },
+        {
+            "name": "CSpeed",
+            "fields": [
+                {
+                    "rule": "required",
+                    "type": "int32",
+                    "name": "value",
+                    "id": 1,
+                    "options": {
+                        "default": 5
+                    }
                 }
             ],
             "enums": [],
@@ -84,10 +108,17 @@ var _root = dcodeIO.ProtoBuf.newBuilder().import({
                     "options": {}
                 },
                 {
+                    "rule": "optional",
+                    "type": "int32",
+                    "name": "color",
+                    "id": 4,
+                    "options": {}
+                },
+                {
                     "rule": "required",
                     "type": "Type",
                     "name": "type",
-                    "id": 4,
+                    "id": 5,
                     "options": {}
                 }
             ],

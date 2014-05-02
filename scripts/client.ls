@@ -1,5 +1,18 @@
 'use strict'
 
+
+class A
+    a :5
+
+    ->  @blabla = @hello
+
+    hello: (word) ->
+        console.log word
+
+a = new A
+a.blabla \john
+
+
 # GAME INITIALIZATION
 game = new Phaser.Game(800, 600, Phaser.CANVAS, '',
     update: update
@@ -18,8 +31,8 @@ class DrawableSystem extends System
         pos = entity.get(CPosition)
 
         if(drawable.type is CDrawable.Type.RECTANGLE)
-            graphics = game.add.graphics 4 4
-                ..beginFill(0xFF3300)
+            graphics = game.add.graphics 0 0
+                ..beginFill(drawable.color)
                 ..drawRect(0, 0, drawable.width, drawable.height)
             @drawables[entity.id] = graphics
 
@@ -67,7 +80,6 @@ class InputSystem extends System
                 ..keyRight = @keyRight.is-down
 
 
-# PHASER.IO
 var drawableSystem, positionSystem, inputSystem, controllerSystem
 
 function create
@@ -82,15 +94,19 @@ function create
     position = new CPosition
         ..x = 5
         ..y = 5
+        ..z = 5
+        ..a = 5
     drawable = new CDrawable
         ..width = 25
         ..height = 80
+        ..color = 0xF5901D
         ..type = CDrawable.Type.RECTANGLE
     em.addComponent player, position
     em.addComponent player, drawable
     em.addComponent player, new CInput
     em.addComponent player, new CSpeed
 
+    console.log position.encode()
 
 function update
     inputSystem.loop!
@@ -100,7 +116,26 @@ function update
 
 
 # Peer.js
-# peer = new Peer {host: \localhost, port: 9000}
+# peer = new Peer null, {host: \localhost, port: 9000}
 # conn = peer.connect \god
-# <- conn .on \open
-# conn.send position.toArrayBuffer!
+# <-! conn .on \open
+# conn.send "hello"
+# conn .on \data (data) !->
+#     console.log data
+
+
+# conn = peer.connect \god
+# conn .on \open (id) ->
+#     conn.send "hello"
+
+#     conn .on \data (data) !->
+#         console.log data
+
+
+net.connect \god \localhost, 9000
+net.onOpen = onOpen
+
+
+function onOpen id
+    console.log \onOpen
+    net.send \hello
