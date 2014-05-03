@@ -7,6 +7,7 @@ class NetEntityManager extends Net
     output: new dcodeIO.ByteBuffer
 
     ->
+        super!
         @onData = @_onData
 
     # SERVER
@@ -20,32 +21,64 @@ class NetEntityManager extends Net
     # COMMON
     pump: ->
         # throw new Error \GIT_CHANGELOG_CHANGELOG_CHANGELOG
+        # console.log \pump
 
         # SEND
-        if @output.offset > 0 
-            @output
+        @output
+            if ..offset > 0
                 ab = ..toArrayBuffer! |> @send
                 ..reset!
 
         # RECEIVE
-        if @input.offset > 0
-            @input
+        @input
+            if ..offset > 0
                 ..flip!
                 @readMessage! 
                 ..reset!
 
     readMessage:  ->
         console.log \readMessage
-        CPosition.decode(@input)
-            console.log ..x
-            console.log ..y
+        console.log "preoffset " + @input.offset
+        console.log "length " + @input.length
+        @input
+            while ..remaining! > 0
+                ..mark!
+                componentType = ..readInt8!
+                length = ..readInt16!
+                console.log "msglength " + length
+                components[componentType].decode ..
+                    console.log ..x
+                    console.log ..y
+                console.log "offset " + ..offset
+                # ..offset = pointer
+                ..reset!
+                ..offset += length + 3
+                console.log "offset-- " + ..offset
+            ..reset!
 
-        # CPosition.decode(@input)
-        #     console.log ..x
-        #     console.log ..y
+        console.log "length " + @input.length
+
+            # CPosition.decode(@input)
+            #     console.log ..x
+            #     console.log ..y
+
+            # # @input.flip!
+            # console.log "postoffset " + @input.offset
+            # @input.offset = 4
+            # CPosition.decode(@input)
+            #     console.log ..x
+            #     console.log ..y
+
+
+    # sendComponent: (component) ->
+
 
     _send: (data) ->
-        data |> dcodeIO.ByteBuffer.wrap |> @output.append
+        ab = data.toArrayBuffer!
+        @output.writeInt8 data.id
+        @output.writeInt16 ab.byteLength
+        console.log "send bytelength " + data.byteLength
+        ab |> dcodeIO.ByteBuffer.wrap |> @output.append
         console.log @output.offset
 
     _onData: (data) ->

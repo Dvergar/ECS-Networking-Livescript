@@ -9,6 +9,7 @@
     prototype.input = new dcodeIO.ByteBuffer;
     prototype.output = new dcodeIO.ByteBuffer;
     function NetEntityManager(){
+      NetEntityManager.superclass.call(this);
       this.onData = this._onData;
     }
     prototype.createEntity = function(){
@@ -21,32 +22,51 @@
     };
     prototype.pump = function(){
       var x$, ab, y$;
-      if (this.output.offset > 0) {
-        x$ = this.output;
+      x$ = this.output;
+      if (x$.offset > 0) {
         ab = this.send(
         x$.toArrayBuffer());
         x$.reset();
       }
-      if (this.input.offset > 0) {
-        y$ = this.input;
+      y$ = this.input;
+      if (y$.offset > 0) {
         y$.flip();
         this.readMessage();
         y$.reset();
-        return y$;
       }
+      return y$;
     };
     prototype.readMessage = function(){
-      var x$;
+      var x$, componentType, length, y$;
       console.log('readMessage');
-      x$ = CPosition.decode(this.input);
-      console.log(x$.x);
-      console.log(x$.y);
-      return x$;
+      console.log("preoffset " + this.input.offset);
+      console.log("length " + this.input.length);
+      x$ = this.input;
+      while (x$.remaining() > 0) {
+        x$.mark();
+        componentType = x$.readInt8();
+        length = x$.readInt16();
+        console.log("msglength " + length);
+        y$ = components[componentType].decode(x$);
+        console.log(y$.x);
+        console.log(y$.y);
+        console.log("offset " + x$.offset);
+        x$.reset();
+        x$.offset += length + 3;
+        console.log("offset-- " + x$.offset);
+      }
+      x$.reset();
+      return console.log("length " + this.input.length);
     };
     prototype._send = function(data){
+      var ab;
+      ab = data.toArrayBuffer();
+      this.output.writeInt8(data.id);
+      this.output.writeInt16(ab.byteLength);
+      console.log("send bytelength " + data.byteLength);
       this.output.append(
       dcodeIO.ByteBuffer.wrap(
-      data));
+      ab));
       return console.log(this.output.offset);
     };
     prototype._onData = function(data){

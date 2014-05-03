@@ -23,42 +23,64 @@
 
 # (`setInterval` 1000) <| -> console.log \test
 
-player = em.createEntity!
-em.addComponent player, new CPosition <<<
-    x: 5
-    y: 5
-em.addComponent player, new CDrawable <<<
-    width: 25
-    height: 80
-    color: 0xF5901D
-    type: CDrawable.Type.RECTANGLE
-em.addComponent player, new CInput
-em.addComponent player, new CSpeed
 
-
-
-bb = new dcodeIO.ByteBuffer!
-bb.writeInt16 42
-bb.writeInt16 42
-bb.writeInt16 42
-# console.log bb.length
-
-net.listen \god \localhost, 9000
-net.onOpen = onOpen  # TODO : check when not set
-# net.onData = onData
 
 position = new CPosition
     ..x = 42
     ..y = 42
 
 position2 = new CPosition
-    ..x = 128
-    ..y = 128
+    ..x = 12
+    ..y = 12
+
+console.log position
+
+output = new dcodeIO.ByteBuffer!
+
+# console.log bb.length
+
+position.encode! |> output.append
+console.log "offset " + output.offset
+# position2.encode! |> output.append
+# console.log "offset " + output.offset
+# console.log position.data.printDebug!
+
+output.writeInt16 100
+
+# output.offset = 0
+output.flip!
+console.log "postflip offset " + output.offset
+console.log "postflip length " + output.length
+# output.offset = 0
+
+
+console.log "buffer " + output.toColumns!
+
+# msg = new CPosition
+# console.log msg
+# msg.decode output, 4
+#     console.log ..x
+#     console.log ..y
+
+# output.offset = 4
+console.log "buffer " + output.toColumns!
+# output.BE!
+console.log "buffer " + output.toColumns!
+console.log "postflip offset " + output.offset
+console.log "postflip length " + output.length
+console.log output.readInt16!
+
+net.listen \god \localhost 9000
+net.onOpen = onOpen
+# net.onData = onData
+
 
 function onOpen conn
     console.log \onOpen
-    net._send position.toArrayBuffer!
-    # net._send position2.toArrayBuffer!
+    net._send position
+    # console.log "offset " + net.output.offset
+    net._send position2
+    # console.log "offset2 " + net.output.offset
 
 function dummy
     console.log
@@ -66,3 +88,17 @@ function dummy
 setInterval  ->
     em.fixedUpdate dummy
 , 1000 / 60fps
+
+
+
+# peer = new Peer \god {host: \localhost, port: 9000}
+
+# peer.on \connection (conn) !->
+#     conn.send \wot
+#     conn.on \open (id) !->
+#         console.log \onopen
+#         conn.send \wff
+
+#     conn.on \data (data) !->
+#         console.log data
+#         conn.send \lel

@@ -37,7 +37,7 @@ function update
 
 
 # NETWORK
-net.connect \god \localhost, 9000
+net.connect \god \localhost 9000
 net.onOpen = onOpen
 # net.onData = onData
 
@@ -58,3 +58,19 @@ function onOpen id
 #     console.log bb.readInt32!
 #     console.log bb.readInt16!
     
+
+
+# peer = new Peer null, {host: \localhost, port: 9000}
+# # conn = peer.connect \god
+# # <-! conn .on \open
+# # conn.send "hello"
+# # conn .on \data (data) !->
+# #     console.log data
+
+
+# conn = peer.connect \god
+# conn .on \open (id) ->
+#     conn.send "hello"
+
+#     conn .on \data (data) !->
+#         console.log data

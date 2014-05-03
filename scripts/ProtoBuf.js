@@ -1972,15 +1972,21 @@
                      * @see ProtoBuf.Builder.Message.decodeHex
                      */
                     Message.decode = function(buffer, enc) {
+                        console.log("message decode");
                         if (buffer === null) throw(new Error("buffer must not be null"));
                         if (typeof buffer === 'string') {
                             buffer = ByteBuffer.wrap(buffer, enc ? enc : "base64");
                         }
+                        // console.log(buffer instanceof ByteBuffer);
                         buffer = buffer instanceof ByteBuffer ? buffer : ByteBuffer.wrap(buffer); // May throw
                         var le = buffer.littleEndian;
                         try {
+                            console.log("le? " + buffer.littleEndian);
+                            console.log("wot " + buffer.offset);
                             var msg = T.decode(buffer.LE());
+                            console.log("wot " + buffer.offset);
                             buffer.LE(le);
+                            console.log("le? " + buffer.littleEndian);
                             return msg;
                         } catch (e) {
                             buffer.LE(le);
@@ -2104,11 +2110,15 @@
              * @expose
              */
             Message.prototype.decode = function(buffer, length) {
+                console.log("lengthththth " + length)
+                console.log("wot2 " + buffer.offset);
                 length = typeof length === 'number' ? length : -1;
                 var start = buffer.offset;
                 var msg = new (this.clazz)();
                 while (buffer.offset < start+length || (length == -1 && buffer.remaining() > 0)) {
+
                     var tag = buffer.readVarint32();
+                    console.log("wot3 " + buffer.offset);
                     var wireType = tag & 0x07,
                         id = tag >> 3;
                     var field = this.getChild(id); // Message.Field only
@@ -2117,28 +2127,38 @@
                         switch (wireType) {
                             case ProtoBuf.WIRE_TYPES.VARINT:
                                 buffer.readVarint32();
+                                console.log("wot4X " + buffer.offset);
                                 break;
                             case ProtoBuf.WIRE_TYPES.BITS32:
                                 buffer.offset += 4;
+                                console.log("wot4 " + buffer.offset);
                                 break;
                             case ProtoBuf.WIRE_TYPES.BITS64:
                                 buffer.offset += 8;
+                                console.log("wot4 " + buffer.offset);
                                 break;
                             case ProtoBuf.WIRE_TYPES.LDELIM:
                                 var len = buffer.readVarint32();
+                                console.log("wot4 " + buffer.offset);
                                 buffer.offset += len;
                                 break;
                             default:
                                 throw(new Error("Illegal wire type of unknown field "+id+" in "+this.toString(true)+"#decode: "+wireType));
+
+
                         }
                         continue;
                     }
                     if (field.repeated && !field.options["packed"]) {
                         msg.add(field.name, field.decode(wireType, buffer));
+                        console.log("wot5 " + buffer.offset);
                     } else {
                         msg.set(field.name, field.decode(wireType, buffer));
+                        console.log("wot5 " + buffer.offset);
                     }
+
                 }
+
                 // Check if all required fields are present
                 var fields = this.getChildren(ProtoBuf.Reflect.Field);
                 for (var i=0; i<fields.length; i++) {
@@ -2148,6 +2168,7 @@
                         throw(err);
                     }
                 }
+
                 return msg;
             };
         
@@ -2514,7 +2535,10 @@
                 
                 // 32bit signed varint zig-zag
                 if (this.type == ProtoBuf.TYPES["sint32"]) {
-                    return buffer.readZigZagVarint32() | 0;
+                    var zz = (buffer.readZigZagVarint32() | 0);
+                    console.log("datfield " + buffer.offset);
+                    return zz;
+                    // return buffer.readZigZagVarint32() | 0;
                 }
                 
                 // Fixed 32bit unsigned

@@ -1,16 +1,20 @@
 'use strict'
 
 # LOAD COMPONENTS FROM .PROTO
-components = dcodeIO.ProtoBuf
+protoComponents = dcodeIO.ProtoBuf
   .loadProtoFile \components.proto
   .build!
 
 # ASSOCIATE IDS TO COMPONENTS
+components = []
 numComponents = 0
-for componentName, componentType of components
+for componentName, componentType of protoComponents
+    components.push componentType
     componentType.id = numComponents
     componentType::id = numComponents++
     window."#componentName" = componentType
+
+export components
 
 
 class Entity

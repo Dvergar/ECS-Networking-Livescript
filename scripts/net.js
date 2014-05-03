@@ -13,8 +13,9 @@
     prototype.listen = function(peerName, host, port){
       var this$ = this;
       this.peer = new Peer(peerName, {
-        host: 'localhost',
-        port: 9000
+        host: host,
+        port: port,
+        debug: 0
       });
       return this.peer.on('connection', function(conn){
         return this$.onConnection(conn);
@@ -31,11 +32,12 @@
       });
       return this.connections.push(conn);
     };
-    prototype.connect = function(peerName){
+    prototype.connect = function(peerName, host, port){
       var this$ = this;
       this.peer = new Peer({
-        host: 'localhost',
-        port: 9000
+        host: host,
+        port: port,
+        debug: 0
       });
       this.conn = this.peer.connect(peerName);
       this.conn.on('open', function(id){
@@ -60,8 +62,7 @@
       return console.log('onOpenDefault');
     };
     prototype.onDataDefault = function(data){
-      console.log('data');
-      return console.log(data);
+      return console.log('onDataDefault');
     };
     return Net;
   }());

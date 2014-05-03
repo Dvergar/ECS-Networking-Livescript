@@ -8,7 +8,7 @@ class Net
 
     # SERVER
     listen: (peerName, host, port) ->
-        @peer = new Peer peerName, {host: \localhost, port: 9000} # common
+        @peer = new Peer peerName, {host: host, port: port, debug: 0} # common
         @peer.on \connection (conn) ~> @onConnection(conn) # server
 
     onConnection: (conn) ->
@@ -17,9 +17,10 @@ class Net
         conn.on \data (data) ~> @onData(data)
         @connections.push conn
 
+
     # CLIENT
-    connect: (peerName) ->
-        @peer = new Peer {host: \localhost, port: 9000} # common
+    connect: (peerName, host, port) ->
+        @peer = new Peer {host: host, port: port, debug: 0} # common
         @conn = @peer.connect peerName
         @conn.on \open (id)   ~> @onOpen(id)
         @conn.on \data (data) ~> @onData(data)
@@ -38,8 +39,7 @@ class Net
         console.log \onOpenDefault
 
     onDataDefault: (data) ->
-        console.log \data
-        console.log data
+        console.log \onDataDefault
 
 
 # export net = new Net
