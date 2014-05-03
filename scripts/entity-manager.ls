@@ -16,7 +16,7 @@ for componentName, componentType of components
 class Entity
     @ids = 0
     code: 0
-    components: [undefined] * numComponents
+    components: [undefined] * numComponents  # ugly!
 
     -> @id = @@ids++
     get: (componentType) -> @components[componentType.id]
@@ -37,6 +37,7 @@ class EntityManager
                 if system.entities[entity.id] is undefined
                     system.entities[entity.id] = entity
                     system.onEntityAdded entity
+        return component
 
     removeComponent: (entity, component) ->
         for system in @systems
@@ -51,6 +52,29 @@ class EntityManager
 
     registerSystem: (system) ->
         @systems.push system
+
+    # FIXED UPDATE: move this stuff
+    fps = 60fps
+    loops = 0
+    skipTicks = 1000ms / fps
+    maxFrameSkip = 10
+    nextGameTick = new Date!getTime!
+    netfps = 20fps
+    lastNetTick = new Date!getTime!
+
+    fixedUpdate: (func) ->
+        if (new Date!getTime! - lastNetTick) > (1000ms / netfps)
+            net.pump!
+            lastNetTick := new Date!getTime!
+
+        loops = 0
+        while new Date!getTime! > nextGameTick && loops < maxFrameSkip
+            func!
+            nextGameTick += skipTicks
+            loops++
+
+
+
 
 
 export em = new EntityManager

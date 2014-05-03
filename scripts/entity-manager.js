@@ -26,13 +26,13 @@
   }());
   EntityManager = (function(){
     EntityManager.displayName = 'EntityManager';
-    var prototype = EntityManager.prototype, constructor = EntityManager;
+    var fps, loops, skipTicks, maxFrameSkip, nextGameTick, netfps, lastNetTick, prototype = EntityManager.prototype, constructor = EntityManager;
     prototype.systems = [];
     prototype.createEntity = function(){
       return new Entity;
     };
     prototype.addComponent = function(entity, component){
-      var i$, ref$, len$, system, results$ = [];
+      var i$, ref$, len$, system;
       entity.components[component.id] = component;
       entity.code = entity.code | 1 << component.id;
       for (i$ = 0, len$ = (ref$ = this.systems).length; i$ < len$; ++i$) {
@@ -40,11 +40,11 @@
         if ((system.code & entity.code) === system.code) {
           if (system.entities[entity.id] === undefined) {
             system.entities[entity.id] = entity;
-            results$.push(system.onEntityAdded(entity));
+            system.onEntityAdded(entity);
           }
         }
       }
-      return results$;
+      return component;
     };
     prototype.removeComponent = function(entity, component){
       var i$, ref$, len$, system;
@@ -62,6 +62,27 @@
     };
     prototype.registerSystem = function(system){
       return this.systems.push(system);
+    };
+    fps = 60;
+    loops = 0;
+    skipTicks = 1000 / fps;
+    maxFrameSkip = 10;
+    nextGameTick = new Date().getTime();
+    netfps = 20;
+    lastNetTick = new Date().getTime();
+    prototype.fixedUpdate = function(func){
+      var loops, results$ = [];
+      if (new Date().getTime() - lastNetTick > 1000 / netfps) {
+        net.pump();
+        lastNetTick = new Date().getTime();
+      }
+      loops = 0;
+      while (new Date().getTime() > nextGameTick && loops < maxFrameSkip) {
+        func();
+        nextGameTick += skipTicks;
+        results$.push(loops++);
+      }
+      return results$;
     };
     function EntityManager(){}
     return EntityManager;
