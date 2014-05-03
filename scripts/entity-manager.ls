@@ -5,6 +5,8 @@ protoComponents = dcodeIO.ProtoBuf
   .loadProtoFile \components.proto
   .build!
 
+export protoComponents
+
 # ASSOCIATE IDS TO COMPONENTS
 components = []
 numComponents = 0
@@ -33,6 +35,7 @@ class EntityManager
         new Entity
 
     addComponent: (entity, component) ->
+        console.log \addComponent
         entity.components[component.id] = component
         entity.code = entity.code .|. (1 .<<. component.id);
 
@@ -41,6 +44,7 @@ class EntityManager
                 if system.entities[entity.id] is undefined
                     system.entities[entity.id] = entity
                     system.onEntityAdded entity
+
         return component
 
     removeComponent: (entity, component) ->
@@ -76,9 +80,6 @@ class EntityManager
             func!
             nextGameTick += skipTicks
             loops++
-
-
-
 
 
 export em = new EntityManager

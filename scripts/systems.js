@@ -37,7 +37,7 @@
   InputSystem = (function(superclass){
     var prototype = extend$((import$(InputSystem, superclass).displayName = 'InputSystem', InputSystem), superclass).prototype, constructor = InputSystem;
     function InputSystem(){
-      this.need([CPosition]);
+      this.need([CPosition, CInput]);
       this.keyUp = game.input.keyboard.addKey(Phaser.Keyboard.UP);
       this.keyDown = game.input.keyboard.addKey(Phaser.Keyboard.DOWN);
       this.keyLeft = game.input.keyboard.addKey(Phaser.Keyboard.LEFT);

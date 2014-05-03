@@ -3,22 +3,36 @@
   'use strict';
   var NetEntityManager, net, out$ = typeof exports != 'undefined' && exports || this;
   NetEntityManager = (function(superclass){
-    var entities, prototype = extend$((import$(NetEntityManager, superclass).displayName = 'NetEntityManager', NetEntityManager), superclass).prototype, constructor = NetEntityManager;
-    NetEntityManager.ids = 0;
+    var entities, CREATE_ENTITY, ADD_COMPONENT, prototype = extend$((import$(NetEntityManager, superclass).displayName = 'NetEntityManager', NetEntityManager), superclass).prototype, constructor = NetEntityManager;
     entities = {};
     prototype.input = new dcodeIO.ByteBuffer;
     prototype.output = new dcodeIO.ByteBuffer;
+    CREATE_ENTITY = 0;
+    ADD_COMPONENT = 1;
     function NetEntityManager(){
       NetEntityManager.superclass.call(this);
       this.onData = this._onData;
     }
     prototype.createEntity = function(){
-      var entity;
+      var entity, x$;
       entity = em.createEntity();
-      return entities[entity.id] = entity;
+      entities[entity.id] = entity;
+      x$ = this.output;
+      x$.writeInt8(CREATE_ENTITY);
+      x$.writeInt16(entity.id);
+      return entity;
     };
     prototype.addComponent = function(entity, component){
-      return em.addComponent(entity(component));
+      var x$, compenc;
+      em.addComponent(entity, component);
+      x$ = this.output;
+      x$.writeInt8(ADD_COMPONENT);
+      x$.writeInt16(entity.id);
+      x$.writeInt8(component.id);
+      compenc = component.encode();
+      x$.writeInt16(compenc.length);
+      x$.append(compenc);
+      return x$;
     };
     prototype.pump = function(){
       var x$, ab, y$;
@@ -37,37 +51,29 @@
       return y$;
     };
     prototype.readMessage = function(){
-      var x$, componentType, length, y$;
+      var x$, msgtype, netid, entity, componentType, msglength, mark, component;
       console.log('readMessage');
-      console.log("preoffset " + this.input.offset);
-      console.log("length " + this.input.length);
       x$ = this.input;
       while (x$.remaining() > 0) {
-        x$.mark();
-        componentType = x$.readInt8();
-        length = x$.readInt16();
-        console.log("msglength " + length);
-        y$ = components[componentType].decode(x$);
-        console.log(y$.x);
-        console.log(y$.y);
-        console.log("offset " + x$.offset);
-        x$.reset();
-        x$.offset += length + 3;
-        console.log("offset-- " + x$.offset);
+        msgtype = x$.readInt8();
+        switch (msgtype) {
+        case CREATE_ENTITY:
+          netid = x$.readInt16();
+          entity = em.createEntity();
+          entities[netid] = entity;
+          break;
+        case ADD_COMPONENT:
+          netid = x$.readInt16();
+          componentType = x$.readInt8();
+          msglength = x$.readInt16();
+          mark = x$.offset;
+          component = components[componentType].decode(x$);
+          em.addComponent(entities[netid], component);
+          x$.offset = mark + msglength;
+        }
       }
       x$.reset();
-      return console.log("length " + this.input.length);
-    };
-    prototype._send = function(data){
-      var ab;
-      ab = data.toArrayBuffer();
-      this.output.writeInt8(data.id);
-      this.output.writeInt16(ab.byteLength);
-      console.log("send bytelength " + data.byteLength);
-      this.output.append(
-      dcodeIO.ByteBuffer.wrap(
-      ab));
-      return console.log(this.output.offset);
+      return x$;
     };
     prototype._onData = function(data){
       return this.input.append(

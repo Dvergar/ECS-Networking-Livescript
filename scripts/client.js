@@ -7,16 +7,10 @@
     create: create
   });
   function create(){
-    var player, ref$;
     drawableSystem = new DrawableSystem;
     positionSystem = new PositionSystem;
     inputSystem = new InputSystem;
-    controllerSystem = new ControllerSystem;
-    player = em.createEntity();
-    em.addComponent(player, (ref$ = new CPosition, ref$.x = 5, ref$.y = 5, ref$));
-    em.addComponent(player, (ref$ = new CDrawable, ref$.width = 25, ref$.height = 80, ref$.color = 0xF5901D, ref$.type = CDrawable.Type.RECTANGLE, ref$));
-    em.addComponent(player, new CInput);
-    return em.addComponent(player, new CSpeed);
+    return controllerSystem = new ControllerSystem;
   }
   function update(){
     return em.fixedUpdate(function(){

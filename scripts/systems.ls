@@ -26,7 +26,7 @@ class DrawableSystem extends System
 
 class InputSystem extends System
     ->
-        @need([CPosition])
+        @need([CPosition, CInput])
         @keyUp := game.input.keyboard.add-key Phaser.Keyboard.UP
         @keyDown := game.input.keyboard.add-key Phaser.Keyboard.DOWN
         @keyLeft := game.input.keyboard.add-key Phaser.Keyboard.LEFT

@@ -1,10 +1,11 @@
 'use strict'
 
 class NetEntityManager extends Net
-    @ids = 0
     entities = {}
     input: new dcodeIO.ByteBuffer
     output: new dcodeIO.ByteBuffer
+    CREATE_ENTITY = 0
+    ADD_COMPONENT = 1
 
     ->
         super!
@@ -15,14 +16,26 @@ class NetEntityManager extends Net
         entity = em.createEntity!
         entities[entity.id] = entity
 
+        @output
+            ..writeInt8 CREATE_ENTITY
+            ..writeInt16 entity.id
+
+        return entity
+
+
     addComponent: (entity, component) ->
-        em.addComponent entity component
+        em.addComponent entity, component
+
+        @output
+            ..writeInt8 ADD_COMPONENT
+            ..writeInt16 entity.id
+            ..writeInt8 component.id
+            compenc = component.encode!
+            ..writeInt16 compenc.length
+            ..append compenc
 
     # COMMON
     pump: ->
-        # throw new Error \GIT_CHANGELOG_CHANGELOG_CHANGELOG
-        # console.log \pump
-
         # SEND
         @output
             if ..offset > 0
@@ -38,48 +51,29 @@ class NetEntityManager extends Net
 
     readMessage:  ->
         console.log \readMessage
-        console.log "preoffset " + @input.offset
-        console.log "length " + @input.length
+
         @input
             while ..remaining! > 0
-                ..mark!
-                componentType = ..readInt8!
-                length = ..readInt16!
-                console.log "msglength " + length
-                components[componentType].decode ..
-                    console.log ..x
-                    console.log ..y
-                console.log "offset " + ..offset
-                # ..offset = pointer
-                ..reset!
-                ..offset += length + 3
-                console.log "offset-- " + ..offset
+                msgtype = ..readInt8!
+
+                switch msgtype
+                case CREATE_ENTITY
+                    netid = ..readInt16!
+
+                    entity = em.createEntity!
+                    entities[netid] = entity
+
+                case ADD_COMPONENT
+                    netid = ..readInt16!
+                    componentType = ..readInt8!
+                    msglength = ..readInt16!
+                    mark = ..offset
+
+                    component = components[componentType].decode ..
+                    em.addComponent entities[netid], component
+
+                    ..offset = mark + msglength
             ..reset!
-
-        console.log "length " + @input.length
-
-            # CPosition.decode(@input)
-            #     console.log ..x
-            #     console.log ..y
-
-            # # @input.flip!
-            # console.log "postoffset " + @input.offset
-            # @input.offset = 4
-            # CPosition.decode(@input)
-            #     console.log ..x
-            #     console.log ..y
-
-
-    # sendComponent: (component) ->
-
-
-    _send: (data) ->
-        ab = data.toArrayBuffer!
-        @output.writeInt8 data.id
-        @output.writeInt16 ab.byteLength
-        console.log "send bytelength " + data.byteLength
-        ab |> dcodeIO.ByteBuffer.wrap |> @output.append
-        console.log @output.offset
 
     _onData: (data) ->
         data |> dcodeIO.ByteBuffer.wrap |> @input.append

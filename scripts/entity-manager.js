@@ -3,6 +3,7 @@
   'use strict';
   var protoComponents, components, numComponents, componentName, componentType, Entity, EntityManager, em, out$ = typeof exports != 'undefined' && exports || this;
   protoComponents = dcodeIO.ProtoBuf.loadProtoFile('components.proto').build();
+  out$.protoComponents = protoComponents;
   components = [];
   numComponents = 0;
   for (componentName in protoComponents) {
@@ -36,6 +37,7 @@
     };
     prototype.addComponent = function(entity, component){
       var i$, ref$, len$, system;
+      console.log('addComponent');
       entity.components[component.id] = component;
       entity.code = entity.code | 1 << component.id;
       for (i$ = 0, len$ = (ref$ = this.systems).length; i$ < len$; ++i$) {
