@@ -28,11 +28,7 @@ class Net
 
     # COMMON
     send: (data) ->
-        console.log \send
-        
-        for conn in @connections
-            console.log \sending + data
-            conn.send data
+        for conn in @connections then conn.send data
 
     # DEFAULTS
     onOpenDefault: (id) ->

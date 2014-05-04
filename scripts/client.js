@@ -7,6 +7,8 @@
     create: create
   });
   function create(){
+    var em;
+    out$.em = em = new EntityManager("client");
     drawableSystem = new DrawableSystem;
     positionSystem = new PositionSystem;
     inputSystem = new InputSystem;

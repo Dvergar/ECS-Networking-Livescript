@@ -61,7 +61,17 @@ class ControllerSystem extends System
             if input.keyRight then pos.x += speed.value
 
 
+class PaddleAutoControllerSystem extends System
+    -> @need([CPosition])
+
+    loop: ->
+        for id, entity of @entities
+            pos = entity.get CPosition
+            pos.x += 1
+
+
 export DrawableSystem
 export InputSystem
 export PositionSystem
 export ControllerSystem
+export PaddleAutoControllerSystem

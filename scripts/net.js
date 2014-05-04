@@ -50,10 +50,8 @@
     };
     prototype.send = function(data){
       var i$, ref$, len$, conn, results$ = [];
-      console.log('send');
       for (i$ = 0, len$ = (ref$ = this.connections).length; i$ < len$; ++i$) {
         conn = ref$[i$];
-        console.log('sending' + data);
         results$.push(conn.send(data));
       }
       return results$;

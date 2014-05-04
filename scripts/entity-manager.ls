@@ -30,12 +30,18 @@ class Entity
 
 class EntityManager
     systems: []
+    (side) ->
+        console.log \SIDE_ + side
+        if side isnt "client" and side isnt "server"
+            throw new Error "Argument should be CLIENT or SERVER"
+
+        if side is "client" then export CLIENT = true
+        if side is "server" then export SERVER = true
 
     createEntity: ->
         new Entity
 
     addComponent: (entity, component, sync) ->
-        console.log \addComponent
         entity.components[component.id] = component
         entity.code = entity.code .|. (1 .<<. component.id);
 
@@ -85,5 +91,7 @@ class EntityManager
             loops++
 
 
-export em = new EntityManager
+export EntityManager
 export SYNC = true
+export CLIENT = false  # Overridden by entity manager
+export SERVER = false  # But this is horrible, please fix

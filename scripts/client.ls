@@ -8,6 +8,8 @@ export game = new Phaser.Game 800, 600, Phaser.CANVAS, '',
 var drawableSystem, positionSystem, inputSystem, controllerSystem
 
 function create
+    export em = new EntityManager "client"
+
     # SYSTEMS
     drawableSystem := new DrawableSystem
     positionSystem := new PositionSystem

@@ -3,12 +3,16 @@
   'use strict';
   var NetEntityManager, net, out$ = typeof exports != 'undefined' && exports || this;
   NetEntityManager = (function(superclass){
-    var entities, CREATE_ENTITY, ADD_COMPONENT, prototype = extend$((import$(NetEntityManager, superclass).displayName = 'NetEntityManager', NetEntityManager), superclass).prototype, constructor = NetEntityManager;
+    var entities, syncComponents, CREATE_ENTITY, CREATE_TEMPLATE_ENTITY, ADD_COMPONENT, prototype = extend$((import$(NetEntityManager, superclass).displayName = 'NetEntityManager', NetEntityManager), superclass).prototype, constructor = NetEntityManager;
     entities = {};
+    syncComponents = {};
+    prototype.templates = [];
+    prototype.templateIds = 0;
     prototype.input = new dcodeIO.ByteBuffer;
     prototype.output = new dcodeIO.ByteBuffer;
     CREATE_ENTITY = 0;
-    ADD_COMPONENT = 1;
+    CREATE_TEMPLATE_ENTITY = 1;
+    ADD_COMPONENT = 2;
     function NetEntityManager(){
       NetEntityManager.superclass.call(this);
       this.onData = this._onData;
@@ -29,13 +33,13 @@
     };
     prototype.addComponent = function(entity, component){
       em.addComponent(entity, component);
-      return this._sendAddComponent(entity, component);
+      return this._sendAddComponent(entity.id, component);
     };
-    prototype._sendAddComponent = function(entity, component){
+    prototype._sendAddComponent = function(entityId, component){
       var x$, compenc;
       x$ = this.output;
       x$.writeInt8(ADD_COMPONENT);
-      x$.writeInt16(entity.id);
+      x$.writeInt16(entityId);
       x$.writeInt8(component.id);
       compenc = component.encode();
       x$.writeInt16(compenc.length);
@@ -43,24 +47,38 @@
       return x$;
     };
     prototype.create = function(entityFunction){
-      var entity, i$, ref$, len$, component, results$ = [];
+      var entity, x$, i$, ref$, len$, component;
       entity = entityFunction();
-      this._sendCreateEntity(entity);
+      x$ = this.output;
+      x$.writeInt8(CREATE_TEMPLATE_ENTITY);
+      x$.writeInt8(entityFunction.id);
+      x$.writeInt16(entity.id);
       for (i$ = 0, len$ = (ref$ = entity.components).length; i$ < len$; ++i$) {
         component = ref$[i$];
         if (component !== undefined) {
-          results$.push(this._sendAddComponent(entity, component));
+          this._sendAddComponent(entity.id, component);
+          if (component.sync) {
+            syncComponents[entity.id] = component;
+          }
         }
       }
-      return results$;
+      return entity;
     };
     prototype.pump = function(){
-      var x$, ab, y$;
+      var entityId, ref$, component, x$, i$, len$, y$;
+      for (entityId in ref$ = syncComponents) {
+        component = ref$[entityId];
+        this._sendAddComponent(entityId, component);
+      }
       x$ = this.output;
       if (x$.offset > 0) {
-        ab = this.send(
+        this.send(
         x$.toArrayBuffer());
         x$.reset();
+      }
+      for (i$ = 0, len$ = (ref$ = syncComponents).length; i$ < len$; ++i$) {
+        component = ref$[i$];
+        _sendAddComponent;
       }
       y$ = this.input;
       if (y$.offset > 0) {
@@ -70,8 +88,12 @@
       }
       return y$;
     };
+    prototype.registerTemplate = function(template){
+      template.id = this.templateIds++;
+      return this.templates.push(template);
+    };
     prototype.readMessage = function(){
-      var x$, msgtype, netid, entity, componentType, msglength, mark, component;
+      var x$, msgtype, netid, entity, entityType, componentType, msglength, mark, component;
       console.log('readMessage');
       x$ = this.input;
       while (x$.remaining() > 0) {
@@ -80,6 +102,12 @@
         case CREATE_ENTITY:
           netid = x$.readInt16();
           entity = em.createEntity();
+          entities[netid] = entity;
+          break;
+        case CREATE_TEMPLATE_ENTITY:
+          entityType = x$.readInt8();
+          netid = x$.readInt16();
+          entity = this.templates[entityType]();
           entities[netid] = entity;
           break;
         case ADD_COMPONENT:
