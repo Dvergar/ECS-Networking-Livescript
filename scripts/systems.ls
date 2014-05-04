@@ -60,6 +60,7 @@ class ControllerSystem extends System
             if input.keyLeft then pos.x -= speed.value
             if input.keyRight then pos.x += speed.value
 
+
 export DrawableSystem
 export InputSystem
 export PositionSystem

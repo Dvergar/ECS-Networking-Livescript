@@ -14,18 +14,21 @@ class NetEntityManager extends Net
     # SERVER
     createEntity: ->
         entity = em.createEntity!
+        @_sendCreateEntity entity
+        return entity
+
+    _sendCreateEntity: (entity) ->
         entities[entity.id] = entity
 
         @output
             ..writeInt8 CREATE_ENTITY
             ..writeInt16 entity.id
 
-        return entity
-
-
     addComponent: (entity, component) ->
         em.addComponent entity, component
+        @_sendAddComponent entity, component
 
+    _sendAddComponent: (entity, component) ->
         @output
             ..writeInt8 ADD_COMPONENT
             ..writeInt16 entity.id
@@ -33,6 +36,13 @@ class NetEntityManager extends Net
             compenc = component.encode!
             ..writeInt16 compenc.length
             ..append compenc
+
+    create: (entityFunction) ->
+        entity = entityFunction!
+        @_sendCreateEntity entity
+        for component in entity.components
+            if component isnt undefined  # Please U_U
+                @_sendAddComponent entity, component
 
     # COMMON
     pump: ->

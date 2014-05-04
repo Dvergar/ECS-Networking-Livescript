@@ -34,7 +34,7 @@ class EntityManager
     createEntity: ->
         new Entity
 
-    addComponent: (entity, component) ->
+    addComponent: (entity, component, sync) ->
         console.log \addComponent
         entity.components[component.id] = component
         entity.code = entity.code .|. (1 .<<. component.id);
@@ -44,6 +44,9 @@ class EntityManager
                 if system.entities[entity.id] is undefined
                     system.entities[entity.id] = entity
                     system.onEntityAdded entity
+
+        # Should probably be at netem level but fuck that
+        if sync then component.sync = true
 
         return component
 
@@ -83,3 +86,4 @@ class EntityManager
 
 
 export em = new EntityManager
+export SYNC = true

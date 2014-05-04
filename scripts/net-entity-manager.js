@@ -14,17 +14,25 @@
       this.onData = this._onData;
     }
     prototype.createEntity = function(){
-      var entity, x$;
+      var entity;
       entity = em.createEntity();
+      this._sendCreateEntity(entity);
+      return entity;
+    };
+    prototype._sendCreateEntity = function(entity){
+      var x$;
       entities[entity.id] = entity;
       x$ = this.output;
       x$.writeInt8(CREATE_ENTITY);
       x$.writeInt16(entity.id);
-      return entity;
+      return x$;
     };
     prototype.addComponent = function(entity, component){
-      var x$, compenc;
       em.addComponent(entity, component);
+      return this._sendAddComponent(entity, component);
+    };
+    prototype._sendAddComponent = function(entity, component){
+      var x$, compenc;
       x$ = this.output;
       x$.writeInt8(ADD_COMPONENT);
       x$.writeInt16(entity.id);
@@ -33,6 +41,18 @@
       x$.writeInt16(compenc.length);
       x$.append(compenc);
       return x$;
+    };
+    prototype.create = function(entityFunction){
+      var entity, i$, ref$, len$, component, results$ = [];
+      entity = entityFunction();
+      this._sendCreateEntity(entity);
+      for (i$ = 0, len$ = (ref$ = entity.components).length; i$ < len$; ++i$) {
+        component = ref$[i$];
+        if (component !== undefined) {
+          results$.push(this._sendAddComponent(entity, component));
+        }
+      }
+      return results$;
     };
     prototype.pump = function(){
       var x$, ab, y$;

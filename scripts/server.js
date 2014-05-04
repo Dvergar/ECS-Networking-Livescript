@@ -4,11 +4,8 @@
   net.listen('god', 'localhost', 9000);
   net.onOpen = onOpen;
   function onOpen(conn){
-    var player, ref$;
     console.log('onOpen');
-    player = net.createEntity();
-    net.addComponent(player, (ref$ = new CPosition, ref$.x = 5, ref$.y = 5, ref$));
-    return net.addComponent(player, (ref$ = new CDrawable, ref$.width = 25, ref$.height = 80, ref$.color = 0xF5901D, ref$.type = CDrawable.Type.RECTANGLE, ref$));
+    return net.create(player);
   }
   function dummy(){
     return console.log;
