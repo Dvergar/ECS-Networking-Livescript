@@ -1,14 +1,15 @@
 'use strict'
 
+
 # GAME INITIALIZATION
 export game = new Phaser.Game 800px, 600px, Phaser.CANVAS, '',
     update: update
     create: create
 
+export em = new EntityManager "client"
 var phaserDrawableSystem, positionSystem, phaserInputSystem, controllerSystem
 
 function create
-    export em = new EntityManager "client"
 
     # SYSTEMS
     phaserDrawableSystem := new PhaserDrawableSystem
@@ -35,6 +36,13 @@ function update
         controllerSystem.loop!
         positionSystem.loop!
         phaserDrawableSystem.loop!
+
+
+
+em.registerEvent(PLAYER, onPlayerCreate)
+function onPlayerCreate event
+    console.log \onPlayerCreate
+    console.log event.entity
 
 
 # NETWORK

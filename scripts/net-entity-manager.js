@@ -3,11 +3,11 @@
   'use strict';
   var NetEntityManager, net, out$ = typeof exports != 'undefined' && exports || this;
   NetEntityManager = (function(superclass){
-    var entities, syncComponents, CREATE_ENTITY, CREATE_TEMPLATE_ENTITY, ADD_COMPONENT, EVENT, prototype = extend$((import$(NetEntityManager, superclass).displayName = 'NetEntityManager', NetEntityManager), superclass).prototype, constructor = NetEntityManager;
+    var entities, syncComponents, templateIds, CREATE_ENTITY, CREATE_TEMPLATE_ENTITY, ADD_COMPONENT, EVENT, prototype = extend$((import$(NetEntityManager, superclass).displayName = 'NetEntityManager', NetEntityManager), superclass).prototype, constructor = NetEntityManager;
     entities = {};
     syncComponents = {};
-    prototype.templates = [];
-    prototype.templateIds = 0;
+    prototype.templates = {};
+    templateIds = numMessages;
     prototype.input = new dcodeIO.ByteBuffer;
     prototype.output = new dcodeIO.ByteBuffer;
     CREATE_ENTITY = 0;
@@ -47,13 +47,17 @@
       x$.append(compenc);
       return x$;
     };
-    prototype.create = function(entityFunction){
+    prototype.create = function(entityFunction, triggerEvent){
       var entity, x$, i$, ref$, len$, component;
+      if (triggerEvent === undefined) {
+        triggerEvent = false;
+      }
       entity = entityFunction();
       x$ = this.output;
       x$.writeInt8(CREATE_TEMPLATE_ENTITY);
       x$.writeInt8(entityFunction.id);
       x$.writeInt16(entity.id);
+      x$.writeInt8(triggerEvent);
       for (i$ = 0, len$ = (ref$ = entity.components).length; i$ < len$; ++i$) {
         component = ref$[i$];
         if (component !== undefined) {
@@ -90,8 +94,8 @@
       return y$;
     };
     prototype.registerTemplate = function(template){
-      template.id = this.templateIds++;
-      return this.templates.push(template);
+      template.id = templateIds++;
+      return this.templates[template.id] = template;
     };
     prototype.sendEvent = function(event){
       var x$, compenc;
@@ -105,7 +109,7 @@
       return x$;
     };
     prototype.readMessage = function(){
-      var x$, msgtype, netid, entity, entityType, componentType, msglength, mark, component, eventType, event, _eventType, ref$, func;
+      var x$, msgtype, netid, entity, entityType, triggerEvent, _eventType, ref$, func, componentType, msglength, mark, component, eventType, event;
       x$ = this.input;
       while (x$.remaining() > 0) {
         msgtype = x$.readInt8();
@@ -118,8 +122,17 @@
         case CREATE_TEMPLATE_ENTITY:
           entityType = x$.readInt8();
           netid = x$.readInt16();
+          triggerEvent = x$.readInt8();
           entity = this.templates[entityType]();
           entities[netid] = entity;
+          if (triggerEvent === 1) {
+            for (_eventType in ref$ = em.events[entityType]) {
+              func = ref$[_eventType];
+              func({
+                entity: entity
+              });
+            }
+          }
           break;
         case ADD_COMPONENT:
           netid = x$.readInt16();

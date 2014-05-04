@@ -4,10 +4,8 @@ export em = new EntityManager "server"
 net.listen \god \localhost 9000
 net.onOpen = onOpen
 
-
 function onInput event
     console.log event.key_up
-
 
 em.registerEvent(INPUT, onInput)
 
@@ -15,7 +13,7 @@ em.registerEvent(INPUT, onInput)
 function onOpen conn
 
     console.log \onOpen
-    player = net.create PLAYER
+    player = net.create PLAYER, true
     pos = player.get CPosition
     pos.x = 300px
 
@@ -40,5 +38,3 @@ setInterval  ->
     # em.fixedUpdate ->
         # paddleAutoControllerSystem.loop!
 , 1000ms / 60fps
-
-export serverz = true

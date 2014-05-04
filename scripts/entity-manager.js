@@ -13,6 +13,7 @@
     window[messageName + ""] = messageType;
   }
   out$.messages = messages;
+  out$.numMessages = numMessages;
   Entity = (function(){
     Entity.displayName = 'Entity';
     var prototype = Entity.prototype, constructor = Entity;
@@ -104,11 +105,11 @@
       }
       return results$;
     };
-    prototype.registerEvent = function(type, func){
-      if (this.events[type.id] === undefined) {
-        this.events[type.id] = [];
+    prototype.registerEvent = function(eventType, func){
+      if (this.events[eventType.id] === undefined) {
+        this.events[eventType.id] = [];
       }
-      return this.events[type.id].push(func);
+      return this.events[eventType.id].push(func);
     };
     return EntityManager;
   }());

@@ -3,8 +3,8 @@
 class NetEntityManager extends Net
     entities = {}
     syncComponents = {}
-    templates: []
-    templateIds: 0
+    templates: {}
+    templateIds = numMessages  # To avoid ID collisions
     input: new dcodeIO.ByteBuffer
     output: new dcodeIO.ByteBuffer
     CREATE_ENTITY = 0
@@ -42,13 +42,15 @@ class NetEntityManager extends Net
             ..writeInt16 compenc.length
             ..append compenc
 
-    create: (entityFunction) ->
+    create: (entityFunction, triggerEvent) ->
+        triggerEvent = false if triggerEvent is undefined
         entity = entityFunction!
 
         @output
             ..writeInt8 CREATE_TEMPLATE_ENTITY
             ..writeInt8 entityFunction.id  # Entity type
             ..writeInt16 entity.id  # Entity uid
+            ..writeInt8 triggerEvent
 
         # @_sendCreateEntity entity
         for component in entity.components
@@ -80,8 +82,8 @@ class NetEntityManager extends Net
                 ..reset!
 
     registerTemplate: (template) ->
-        template.id = @templateIds++
-        @templates.push template
+        template.id = templateIds++
+        @templates[template.id] = template
 
     sendEvent: (event) ->
         console.log \sendEvent
@@ -108,9 +110,14 @@ class NetEntityManager extends Net
                 case CREATE_TEMPLATE_ENTITY
                     entityType = ..readInt8!
                     netid = ..readInt16!
+                    triggerEvent = ..readInt8!
 
                     entity = @templates[entityType]!
                     entities[netid] = entity
+
+                    if triggerEvent is 1
+                        for _eventType, func of em.events[entityType]
+                            func entity: entity
 
                 case ADD_COMPONENT
                     netid = ..readInt16!

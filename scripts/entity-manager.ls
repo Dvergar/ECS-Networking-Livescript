@@ -14,7 +14,7 @@ for messageName, messageType of protoMessages
     messageType::id = numMessages++
     window."#messageName" = messageType
 
-export messages
+export messages, numMessages
 
 
 class Entity
@@ -89,9 +89,10 @@ class EntityManager
             nextGameTick += skipTicks
             loops++
 
-    registerEvent: (type, func) ->
-        if @events[type.id] is undefined then @events[type.id] = []
-        @events[type.id].push func
+    registerEvent: (eventType, func) ->
+        if @events[eventType.id] is undefined then @events[eventType.id] = []
+        @events[eventType.id].push func
+
 
 
 
