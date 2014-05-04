@@ -5,6 +5,10 @@
   out$.em = em = new EntityManager("server");
   net.listen('god', 'localhost', 9000);
   net.onOpen = onOpen;
+  function onInput(event){
+    return console.log(event.key_up);
+  }
+  em.registerEvent(INPUT, onInput);
   function onOpen(conn){
     var player, pos;
     console.log('onOpen');

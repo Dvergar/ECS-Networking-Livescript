@@ -12,6 +12,7 @@
     if (CLIENT) {
       console.log('CLIENTPLAYER');
       em.addComponent(entity, (ref$ = new CDrawable, ref$.width = 25, ref$.height = 80, ref$.color = 0xF5901D, ref$.type = CDrawable.Type.RECTANGLE, ref$));
+      em.addComponent(entity, new CInput);
     }
     return entity;
   }

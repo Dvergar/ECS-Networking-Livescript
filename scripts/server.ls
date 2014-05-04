@@ -1,9 +1,15 @@
 'use strict'
 
-
 export em = new EntityManager "server"
 net.listen \god \localhost 9000
 net.onOpen = onOpen
+
+
+function onInput event
+    console.log event.key_up
+
+
+em.registerEvent(INPUT, onInput)
 
 
 function onOpen conn
@@ -11,7 +17,7 @@ function onOpen conn
     console.log \onOpen
     player = net.create PLAYER
     pos = player.get CPosition
-    pos.x = 300
+    pos.x = 300px
 
     # entity = net.createEntity!
     # net.addComponent entity, new CPosition <<<
@@ -33,6 +39,6 @@ setInterval  ->
     em.fixedUpdate dummy
     # em.fixedUpdate ->
         # paddleAutoControllerSystem.loop!
-, 1000 / 60fps
+, 1000ms / 60fps
 
 export serverz = true

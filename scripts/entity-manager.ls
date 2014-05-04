@@ -1,28 +1,26 @@
 'use strict'
 
 # LOAD COMPONENTS FROM .PROTO
-protoComponents = dcodeIO.ProtoBuf
+protoMessages = dcodeIO.ProtoBuf
   .loadProtoFile \components.proto
   .build!
 
-export protoComponents
+# ASSOCIATE IDS TO MESSAGES
+messages = []
+numMessages = 0
+for messageName, messageType of protoMessages
+    messages.push messageType
+    messageType.id = numMessages
+    messageType::id = numMessages++
+    window."#messageName" = messageType
 
-# ASSOCIATE IDS TO COMPONENTS
-components = []
-numComponents = 0
-for componentName, componentType of protoComponents
-    components.push componentType
-    componentType.id = numComponents
-    componentType::id = numComponents++
-    window."#componentName" = componentType
-
-export components
+export messages
 
 
 class Entity
     @ids = 0
     code: 0
-    components: [undefined] * numComponents  # ugly!
+    components: [undefined] * numMessages  # ugly!
 
     -> @id = @@ids++
     get: (componentType) -> @components[componentType.id]
@@ -30,6 +28,7 @@ class Entity
 
 class EntityManager
     systems: []
+    events: {}
     (side) ->
         console.log \SIDE_ + side
         if side isnt "client" and side isnt "server"
@@ -52,7 +51,7 @@ class EntityManager
                     system.onEntityAdded entity
 
         # Should probably be at netem level but fuck that
-        if sync then component.sync = true
+        if sync is true then component.sync = true
 
         return component
 
@@ -89,6 +88,11 @@ class EntityManager
             func!
             nextGameTick += skipTicks
             loops++
+
+    registerEvent: (type, func) ->
+        if @events[type.id] is undefined then @events[type.id] = []
+        @events[type.id].push func
+
 
 
 export EntityManager

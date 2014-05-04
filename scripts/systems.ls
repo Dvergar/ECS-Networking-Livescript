@@ -1,7 +1,7 @@
 'use strict'
 
 # CLIENT
-class DrawableSystem extends System
+class PhaserDrawableSystem extends System
     drawables: {}
     -> @need([CDrawable, CPosition])
 
@@ -11,9 +11,9 @@ class DrawableSystem extends System
         pos = entity.get(CPosition)
 
         if(drawable.type is CDrawable.Type.RECTANGLE)
-            graphics = game.add.graphics 0 0
+            graphics = game.add.graphics 0px 0px
                 ..beginFill(drawable.color)
-                ..drawRect(0, 0, drawable.width, drawable.height)
+                ..drawRect(0px, 0px, drawable.width, drawable.height)
             @drawables[entity.id] = graphics
 
     loop: ->
@@ -24,7 +24,7 @@ class DrawableSystem extends System
                 ..y = pos.y
 
 
-class InputSystem extends System
+class PhaserInputSystem extends System
     ->
         @need([CPosition, CInput])
         @keyUp := game.input.keyboard.add-key Phaser.Keyboard.UP
@@ -34,11 +34,18 @@ class InputSystem extends System
 
     loop: ->
         for id, entity of @entities
-            input = entity.get(CInput)
+            # console.log \lel
+            input = entity.get CInput
                 ..keyUp = @keyUp.is-down
                 ..keyDown = @keyDown.is-down
                 ..keyLeft = @keyLeft.is-down
                 ..keyRight = @keyRight.is-down
+
+            # net.sendEvent new INPUT <<<
+            #     keyUp: @keyUp.is-down
+            #     keyDown: @keyDown.is-down
+            #     keyLeft: @keyLeft.is-down
+            #     keyRight: @keyRight.is-down
 
 
 # COMMON
@@ -67,11 +74,11 @@ class PaddleAutoControllerSystem extends System
     loop: ->
         for id, entity of @entities
             pos = entity.get CPosition
-            pos.x += 1
+            pos.x += 1px
 
 
-export DrawableSystem
-export InputSystem
+export PhaserDrawableSystem
+export PhaserInputSystem
 export PositionSystem
 export ControllerSystem
 export PaddleAutoControllerSystem

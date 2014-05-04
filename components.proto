@@ -31,3 +31,14 @@ message CDrawable
         IMAGE = 2;
     }
 }
+
+// NETWORK EVENTS
+
+message INPUT
+{
+    required bool key_up = 1;
+    required bool key_down = 2;
+    required bool key_left = 3;
+    required bool key_right = 4;
+    required int32 entity_id = 5;
+}

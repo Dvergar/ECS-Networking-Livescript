@@ -53,13 +53,6 @@ var _root = dcodeIO.ProtoBuf.newBuilder().import({
                     "name": "y",
                     "id": 2,
                     "options": {}
-                },
-                {
-                    "rule": "required",
-                    "type": "sint32",
-                    "name": "z",
-                    "id": 3,
-                    "options": {}
                 }
             ],
             "enums": [],
@@ -138,6 +131,49 @@ var _root = dcodeIO.ProtoBuf.newBuilder().import({
                     "options": {}
                 }
             ],
+            "messages": [],
+            "options": {}
+        },
+        {
+            "name": "INPUT",
+            "fields": [
+                {
+                    "rule": "required",
+                    "type": "bool",
+                    "name": "key_up",
+                    "id": 1,
+                    "options": {}
+                },
+                {
+                    "rule": "required",
+                    "type": "bool",
+                    "name": "key_down",
+                    "id": 2,
+                    "options": {}
+                },
+                {
+                    "rule": "required",
+                    "type": "bool",
+                    "name": "key_left",
+                    "id": 3,
+                    "options": {}
+                },
+                {
+                    "rule": "required",
+                    "type": "bool",
+                    "name": "key_right",
+                    "id": 4,
+                    "options": {}
+                },
+                {
+                    "rule": "required",
+                    "type": "int32",
+                    "name": "entity_id",
+                    "id": 5,
+                    "options": {}
+                }
+            ],
+            "enums": [],
             "messages": [],
             "options": {}
         }

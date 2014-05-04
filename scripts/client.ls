@@ -1,19 +1,19 @@
 'use strict'
 
 # GAME INITIALIZATION
-export game = new Phaser.Game 800, 600, Phaser.CANVAS, '',
+export game = new Phaser.Game 800px, 600px, Phaser.CANVAS, '',
     update: update
     create: create
 
-var drawableSystem, positionSystem, inputSystem, controllerSystem
+var phaserDrawableSystem, positionSystem, phaserInputSystem, controllerSystem
 
 function create
     export em = new EntityManager "client"
 
     # SYSTEMS
-    drawableSystem := new DrawableSystem
+    phaserDrawableSystem := new PhaserDrawableSystem
     positionSystem := new PositionSystem
-    inputSystem := new InputSystem
+    phaserInputSystem := new PhaserInputSystem
     controllerSystem := new ControllerSystem
 
     # ENTITIES
@@ -31,10 +31,10 @@ function create
 
 function update
     em.fixedUpdate ->
-        inputSystem.loop!
+        phaserInputSystem.loop!
         controllerSystem.loop!
         positionSystem.loop!
-        drawableSystem.loop!
+        phaserDrawableSystem.loop!
 
 
 # NETWORK
@@ -43,3 +43,10 @@ net.onOpen = onOpen
 
 function onOpen id
     console.log \onOpen
+
+    net.sendEvent new INPUT <<<
+        key_up: true
+        key_down: true
+        key_left: true
+        key_right: true
+        entity_id: 0

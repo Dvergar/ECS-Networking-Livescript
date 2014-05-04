@@ -3,7 +3,7 @@
   'use strict';
   var NetEntityManager, net, out$ = typeof exports != 'undefined' && exports || this;
   NetEntityManager = (function(superclass){
-    var entities, syncComponents, CREATE_ENTITY, CREATE_TEMPLATE_ENTITY, ADD_COMPONENT, prototype = extend$((import$(NetEntityManager, superclass).displayName = 'NetEntityManager', NetEntityManager), superclass).prototype, constructor = NetEntityManager;
+    var entities, syncComponents, CREATE_ENTITY, CREATE_TEMPLATE_ENTITY, ADD_COMPONENT, EVENT, prototype = extend$((import$(NetEntityManager, superclass).displayName = 'NetEntityManager', NetEntityManager), superclass).prototype, constructor = NetEntityManager;
     entities = {};
     syncComponents = {};
     prototype.templates = [];
@@ -13,6 +13,7 @@
     CREATE_ENTITY = 0;
     CREATE_TEMPLATE_ENTITY = 1;
     ADD_COMPONENT = 2;
+    EVENT = 3;
     function NetEntityManager(){
       NetEntityManager.superclass.call(this);
       this.onData = this._onData;
@@ -92,9 +93,19 @@
       template.id = this.templateIds++;
       return this.templates.push(template);
     };
+    prototype.sendEvent = function(event){
+      var x$, compenc;
+      console.log('sendEvent');
+      x$ = this.output;
+      x$.writeInt8(EVENT);
+      x$.writeInt8(event.id);
+      compenc = event.encode();
+      x$.writeInt16(compenc.length);
+      x$.append(compenc);
+      return x$;
+    };
     prototype.readMessage = function(){
-      var x$, msgtype, netid, entity, entityType, componentType, msglength, mark, component;
-      console.log('readMessage');
+      var x$, msgtype, netid, entity, entityType, componentType, msglength, mark, component, eventType, event, _eventType, ref$, func;
       x$ = this.input;
       while (x$.remaining() > 0) {
         msgtype = x$.readInt8();
@@ -115,8 +126,19 @@
           componentType = x$.readInt8();
           msglength = x$.readInt16();
           mark = x$.offset;
-          component = components[componentType].decode(x$);
+          component = messages[componentType].decode(x$);
           em.addComponent(entities[netid], component);
+          x$.offset = mark + msglength;
+          break;
+        case EVENT:
+          eventType = x$.readInt8();
+          msglength = x$.readInt16();
+          mark = x$.offset;
+          event = messages[eventType].decode(x$);
+          for (_eventType in ref$ = em.events[eventType]) {
+            func = ref$[_eventType];
+            func(event);
+          }
           x$.offset = mark + msglength;
         }
       }

@@ -17,7 +17,6 @@ class Net
         conn.on \data (data) ~> @onData(data)
         @connections.push conn
 
-
     # CLIENT
     connect: (peerName, host, port) ->
         @peer = new Peer {host: host, port: port, debug: 0} # common

@@ -10,6 +10,7 @@ class NetEntityManager extends Net
     CREATE_ENTITY = 0
     CREATE_TEMPLATE_ENTITY = 1
     ADD_COMPONENT = 2
+    EVENT = 3
 
     ->
         super!
@@ -82,11 +83,19 @@ class NetEntityManager extends Net
         template.id = @templateIds++
         @templates.push template
 
-    readMessage:  ->
-        console.log \readMessage
+    sendEvent: (event) ->
+        console.log \sendEvent
 
+        @output
+            ..writeInt8 EVENT
+            ..writeInt8 event.id
+            compenc = event.encode!
+            ..writeInt16 compenc.length
+            ..append compenc
+
+    readMessage:  ->
         @input
-            while ..remaining! > 0
+            while ..remaining! > 0byte
                 msgtype = ..readInt8!
 
                 switch msgtype
@@ -109,10 +118,21 @@ class NetEntityManager extends Net
                     msglength = ..readInt16!
                     mark = ..offset
 
-                    component = components[componentType].decode ..
+                    component = messages[componentType].decode ..
                     em.addComponent entities[netid], component
-
                     ..offset = mark + msglength
+
+                case EVENT
+                    eventType = ..readInt8!
+                    msglength = ..readInt16!
+                    mark = ..offset
+
+                    event = messages[eventType].decode ..
+                    for _eventType, func of em.events[eventType]
+                        func event
+                    
+                    ..offset = mark + msglength
+
             ..reset!
 
     _onData: (data) ->

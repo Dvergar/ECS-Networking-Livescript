@@ -15,10 +15,12 @@ function PLAYER
     if CLIENT
         console.log \CLIENTPLAYER
         em.addComponent entity, new CDrawable <<<
-            width: 25
-            height: 80
+            width: 25px
+            height: 80px
             color: 0xF5901D
             type: CDrawable.Type.RECTANGLE
+
+        em.addComponent entity, new CInput
 
     return entity
 net.registerTemplate(PLAYER)
