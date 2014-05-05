@@ -13,8 +13,12 @@ class PhaserDrawableSystem extends System
         if(drawable.type is CDrawable.Type.RECTANGLE)
             graphics = game.add.graphics 0px 0px
                 ..beginFill(drawable.color)
-                ..drawRect(0px, 0px, drawable.width, drawable.height)
+                ..drawRect 0px, 0px, drawable.width, drawable.height
             @drawables[entity.id] = graphics
+
+        if(drawable.type is CDrawable.Type.IMAGE)
+            sprite = game.add.sprite 0, 0, drawable.image_name
+            @drawables[entity.id] = sprite
 
     loop: ->
         for id, entity of @entities
@@ -34,7 +38,6 @@ class PhaserInputSystem extends System
 
     loop: ->
         for id, entity of @entities
-            # console.log \lel
             input = entity.get CInput
                 ..keyUp = @keyUp.is-down
                 ..keyDown = @keyDown.is-down
@@ -46,11 +49,6 @@ class PhaserInputSystem extends System
             #     keyDown: @keyDown.is-down
             #     keyLeft: @keyLeft.is-down
             #     keyRight: @keyRight.is-down
-
-
-# COMMON
-class PositionSystem extends System
-    -> @need([CPosition])
 
 
 class ControllerSystem extends System
@@ -77,8 +75,39 @@ class PaddleAutoControllerSystem extends System
             pos.x += 1px
 
 
+class TargetSystem extends System
+    -> @need([CPosition, CTargetPosition])
+
+    onEntityAdded: (entity) ->
+        pos = entity.get CPosition
+        tpos = entity.get CTargetPosition
+        tpos.startx = pos.x
+        tpos.starty = pos.y
+        tpos.percent = tpos.step
+
+    loop: ->
+        for id, entity of @entities
+            pos = entity.get CPosition
+            tpos = entity.get CTargetPosition
+            pos.x = tpos.startx + (tpos.x - tpos.startx) * tpos.percent
+            tpos.percent += tpos.step
+            if tpos.percent > 1
+                em.removeComponent entity, CTargetPosition
+
+
+class PhaserFollowMouseSystem extends System
+    -> @need([CPosition, CPhaserFollowMouse])
+
+    loop: ->
+        for id, entity of @entities
+            pos = entity.get CPosition
+            pos.x = game.input.mousePointer.x;
+            pos.y = game.input.mousePointer.y;
+
+
 export PhaserDrawableSystem
 export PhaserInputSystem
-export PositionSystem
 export ControllerSystem
 export PaddleAutoControllerSystem
+export TargetSystem
+export PhaserFollowMouseSystem

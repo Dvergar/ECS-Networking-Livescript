@@ -20,9 +20,10 @@ export messages, numMessages
 class Entity
     @ids = 0
     code: 0
-    components: [undefined] * numMessages  # ugly!
+    ->
+        @id = @@ids++
+        @components = [undefined] * numMessages
 
-    -> @id = @@ids++
     get: (componentType) -> @components[componentType.id]
 
 
@@ -55,13 +56,15 @@ class EntityManager
 
         return component
 
-    removeComponent: (entity, component) ->
+    removeComponent: (entity, componentType) ->
+        console.log \removeComponent
         for system in @systems
             if (system.code .&. entity.code) is system.code
+                delete system.entities[entity.id]
                 system.onEntityRemoved entity
 
-        entity.code = entity.code .&. ~(1 .<<. component.id)
-        entity.components[component.id] = undefined
+        entity.code = entity.code .&. ~(1 .<<. componentType.id)
+        entity.components[componentType.id] = undefined
 
     getComponent: (entity, componentType) ->
         entity.components[componentType.id]

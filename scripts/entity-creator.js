@@ -8,7 +8,7 @@
     console.log('SIDE_' + SERVER);
     console.log('PLAYER');
     entity = em.createEntity();
-    em.addComponent(entity, (ref$ = new CPosition, ref$.x = 5, ref$.y = 5, ref$), SYNC);
+    em.addComponent(entity, (ref$ = new CPosition, ref$.x = 5, ref$.y = 5, ref$));
     if (CLIENT) {
       console.log('CLIENTPLAYER');
       em.addComponent(entity, (ref$ = new CDrawable, ref$.width = 25, ref$.height = 80, ref$.color = 0xF5901D, ref$.type = CDrawable.Type.RECTANGLE, ref$));

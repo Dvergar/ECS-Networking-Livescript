@@ -10,7 +10,7 @@ function PLAYER
     em.addComponent entity, new CPosition <<<
         x: 5
         y: 5
-    , SYNC
+    # , SYNC
 
     if CLIENT
         console.log \CLIENTPLAYER

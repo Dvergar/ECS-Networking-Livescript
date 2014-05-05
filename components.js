@@ -42,14 +42,14 @@ var _root = dcodeIO.ProtoBuf.newBuilder().import({
             "fields": [
                 {
                     "rule": "required",
-                    "type": "sint32",
+                    "type": "int32",
                     "name": "x",
                     "id": 1,
                     "options": {}
                 },
                 {
                     "rule": "required",
-                    "type": "sint32",
+                    "type": "int32",
                     "name": "y",
                     "id": 2,
                     "options": {}
@@ -131,6 +131,63 @@ var _root = dcodeIO.ProtoBuf.newBuilder().import({
                     "options": {}
                 }
             ],
+            "messages": [],
+            "options": {}
+        },
+        {
+            "name": "CTargetPosition",
+            "fields": [
+                {
+                    "rule": "required",
+                    "type": "int32",
+                    "name": "x",
+                    "id": 1,
+                    "options": {}
+                },
+                {
+                    "rule": "required",
+                    "type": "int32",
+                    "name": "y",
+                    "id": 2,
+                    "options": {}
+                },
+                {
+                    "rule": "required",
+                    "type": "int32",
+                    "name": "step",
+                    "id": 3,
+                    "options": {}
+                },
+                {
+                    "rule": "optional",
+                    "type": "int32",
+                    "name": "startx",
+                    "id": 4,
+                    "options": {}
+                },
+                {
+                    "rule": "optional",
+                    "type": "int32",
+                    "name": "starty",
+                    "id": 5,
+                    "options": {}
+                },
+                {
+                    "rule": "optional",
+                    "type": "int32",
+                    "name": "percent",
+                    "id": 6,
+                    "options": {}
+                }
+            ],
+            "enums": [],
+            "messages": [],
+            "options": {}
+        },
+        {
+            "name": "CPhaserFollowMouse",
+            "fields": [],
+            "enums": [],
             "messages": [],
             "options": {}
         },

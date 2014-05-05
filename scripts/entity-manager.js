@@ -19,9 +19,9 @@
     var prototype = Entity.prototype, constructor = Entity;
     Entity.ids = 0;
     prototype.code = 0;
-    prototype.components = repeatArray$([undefined], numMessages);
     function Entity(){
       this.id = constructor.ids++;
+      this.components = repeatArray$([undefined], numMessages);
     }
     prototype.get = function(componentType){
       return this.components[componentType.id];
@@ -67,16 +67,18 @@
       }
       return component;
     };
-    prototype.removeComponent = function(entity, component){
+    prototype.removeComponent = function(entity, componentType){
       var i$, ref$, len$, system;
+      console.log('removeComponent');
       for (i$ = 0, len$ = (ref$ = this.systems).length; i$ < len$; ++i$) {
         system = ref$[i$];
         if ((system.code & entity.code) === system.code) {
+          delete system.entities[entity.id];
           system.onEntityRemoved(entity);
         }
       }
-      entity.code = entity.code & ~(1 << component.id);
-      return entity.components[component.id] = undefined;
+      entity.code = entity.code & ~(1 << componentType.id);
+      return entity.components[componentType.id] = undefined;
     };
     prototype.getComponent = function(entity, componentType){
       return entity.components[componentType.id];

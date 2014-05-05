@@ -3,7 +3,7 @@
   'use strict';
   var NetEntityManager, net, out$ = typeof exports != 'undefined' && exports || this;
   NetEntityManager = (function(superclass){
-    var entities, syncComponents, templateIds, CREATE_ENTITY, CREATE_TEMPLATE_ENTITY, ADD_COMPONENT, EVENT, prototype = extend$((import$(NetEntityManager, superclass).displayName = 'NetEntityManager', NetEntityManager), superclass).prototype, constructor = NetEntityManager;
+    var entities, syncComponents, templateIds, CREATE_ENTITY, CREATE_TEMPLATE_ENTITY, ADD_COMPONENT, REMOVE_COMPONENT, EVENT, prototype = extend$((import$(NetEntityManager, superclass).displayName = 'NetEntityManager', NetEntityManager), superclass).prototype, constructor = NetEntityManager;
     entities = {};
     syncComponents = {};
     prototype.templates = {};
@@ -13,15 +13,19 @@
     CREATE_ENTITY = 0;
     CREATE_TEMPLATE_ENTITY = 1;
     ADD_COMPONENT = 2;
-    EVENT = 3;
+    REMOVE_COMPONENT = 3;
+    EVENT = 4;
     function NetEntityManager(){
       NetEntityManager.superclass.call(this);
       this.onData = this._onData;
+      this.input.BE();
+      this.output.BE();
     }
     prototype.createEntity = function(){
       var entity;
       entity = em.createEntity();
       this._sendCreateEntity(entity);
+      console.log(this.output.toColumns());
       return entity;
     };
     prototype._sendCreateEntity = function(entity){
@@ -38,14 +42,29 @@
     };
     prototype._sendAddComponent = function(entityId, component){
       var x$, compenc;
+      console.log('_sendAddComponent');
       x$ = this.output;
       x$.writeInt8(ADD_COMPONENT);
       x$.writeInt16(entityId);
       x$.writeInt8(component.id);
       compenc = component.encode();
       x$.writeInt16(compenc.length);
+      console.log('offset_' + x$.offset);
       x$.append(compenc);
+      console.log('offset_' + x$.offset);
+      console.log('length_' + x$.length);
+      console.log(x$.toColumns());
       return x$;
+    };
+    prototype.removeComponent = function(entity, componentType){
+      var x$;
+      console.log('removeComponent');
+      console.log(entity.get(componentType).sync);
+      x$ = this.output;
+      x$.writeInt8(REMOVE_COMPONENT);
+      x$.writeInt16(entity.id);
+      x$.writeInt8(componentType.id);
+      return console.log('pasquoifaire');
     };
     prototype.create = function(entityFunction, triggerEvent){
       var entity, x$, i$, ref$, len$, component;
@@ -70,20 +89,17 @@
       return entity;
     };
     prototype.pump = function(){
-      var entityId, ref$, component, x$, i$, len$, y$;
-      for (entityId in ref$ = syncComponents) {
-        component = ref$[entityId];
-        this._sendAddComponent(entityId, component);
-      }
+      var x$, entityId, ref$, component, y$;
       x$ = this.output;
       if (x$.offset > 0) {
         this.send(
         x$.toArrayBuffer());
         x$.reset();
       }
-      for (i$ = 0, len$ = (ref$ = syncComponents).length; i$ < len$; ++i$) {
-        component = ref$[i$];
-        _sendAddComponent;
+      for (entityId in ref$ = syncComponents) {
+        component = ref$[entityId];
+        console.log('SYNC');
+        this._sendAddComponent(entityId, component);
       }
       y$ = this.input;
       if (y$.offset > 0) {
@@ -101,30 +117,39 @@
       var x$, compenc;
       console.log('sendEvent');
       x$ = this.output;
+      console.log('offset_' + x$.offset);
       x$.writeInt8(EVENT);
       x$.writeInt8(event.id);
       compenc = event.encode();
       x$.writeInt16(compenc.length);
+      console.log('offsetbeforeevent_' + x$.offset);
       x$.append(compenc);
+      console.log('offsetafterevent_' + x$.offset);
+      console.log(x$.toColumns());
       return x$;
     };
     prototype.readMessage = function(){
-      var x$, msgtype, netid, entity, entityType, triggerEvent, _eventType, ref$, func, componentType, msglength, mark, component, eventType, event;
+      var x$, msgtype, entityId, entity, entityType, triggerEvent, _eventType, ref$, func, componentType, msglength, mark, component, eventType, event;
+      console.log('readMessage');
+      console.log(this.input.toColumns());
       x$ = this.input;
       while (x$.remaining() > 0) {
         msgtype = x$.readInt8();
         switch (msgtype) {
         case CREATE_ENTITY:
-          netid = x$.readInt16();
+          console.log('CREATE_ENTITY');
+          entityId = x$.readInt16();
           entity = em.createEntity();
-          entities[netid] = entity;
+          entities[entityId] = entity;
+          console.log(x$.toColumns());
           break;
         case CREATE_TEMPLATE_ENTITY:
+          console.log('CREATE_TEMPLATE_ENTITY');
           entityType = x$.readInt8();
-          netid = x$.readInt16();
+          entityId = x$.readInt16();
           triggerEvent = x$.readInt8();
           entity = this.templates[entityType]();
-          entities[netid] = entity;
+          entities[entityId] = entity;
           if (triggerEvent === 1) {
             for (_eventType in ref$ = em.events[entityType]) {
               func = ref$[_eventType];
@@ -133,23 +158,39 @@
               });
             }
           }
+          console.log('offset_' + x$.offset);
           break;
         case ADD_COMPONENT:
-          netid = x$.readInt16();
+          console.log('ADD_COMPONENT');
+          entityId = x$.readInt16();
           componentType = x$.readInt8();
           msglength = x$.readInt16();
           mark = x$.offset;
+          console.log('mark_' + mark);
+          console.log('entityId_' + entityId);
+          console.log('componentType_' + componentType);
+          console.log('msglength_' + msglength);
+          console.log('afteroffset_' + (mark + msglength));
+          console.log(this.input.toColumns());
           component = messages[componentType].decode(x$);
-          em.addComponent(entities[netid], component);
+          em.addComponent(entities[entityId], component);
           x$.offset = mark + msglength;
           break;
+        case REMOVE_COMPONENT:
+          console.log('REMOVE_COMPONENT');
+          entityId = x$.readInt16();
+          componentType = x$.readInt8();
+          em.removeComponent(entities[entityId], messages[componentType]);
+          break;
         case EVENT:
+          console.log('EVENT');
           eventType = x$.readInt8();
           msglength = x$.readInt16();
           mark = x$.offset;
           event = messages[eventType].decode(x$);
           for (_eventType in ref$ = em.events[eventType]) {
             func = ref$[_eventType];
+            console.log('throevent');
             func(event);
           }
           x$.offset = mark + msglength;

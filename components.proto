@@ -8,8 +8,8 @@ message CInput
 
 message CPosition
 {
-    required sint32 x = 1;
-    required sint32 y = 2;
+    required int32 x = 1;
+    required int32 y = 2;
 }
 
 message CSpeed
@@ -30,6 +30,22 @@ message CDrawable
         RECTANGLE = 1;
         IMAGE = 2;
     }
+}
+
+message CTargetPosition
+{
+    required int32 x = 1;
+    required int32 y = 2;
+    required int32 step = 3;
+    optional int32 startx = 4;
+    optional int32 starty = 5;
+    optional int32 percent = 6;
+}
+
+
+message CPhaserFollowMouse
+{
+
 }
 
 // NETWORK EVENTS
