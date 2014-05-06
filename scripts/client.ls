@@ -17,8 +17,13 @@ var phaserFollowMouseSystem
 function preload
     console.log \preload
     game.load.image 'wall', 'wall.png'
+    game.load.image 'ship', 'ship.png'
 
 function create
+    # PHASER
+    game.stage.backgroundColor = '#070624';
+
+
     # SYSTEMS
     phaserDrawableSystem := new PhaserDrawableSystem
     phaserInputSystem := new PhaserInputSystem
@@ -44,7 +49,7 @@ function create
         x: 100px
         y: 100px
     em.addComponent ship, new CDrawable <<<
-        image_name: "wall"
+        image_name: "ship"
         type: CDrawable.Type.IMAGE
     em.addComponent ship, new CPhaserFollowMouse
 

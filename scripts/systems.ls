@@ -19,6 +19,8 @@ class PhaserDrawableSystem extends System
         if(drawable.type is CDrawable.Type.IMAGE)
             sprite = game.add.sprite 0, 0, drawable.image_name
             @drawables[entity.id] = sprite
+            sprite.anchor.setTo(0.5, 0.5);
+
 
     loop: ->
         for id, entity of @entities
@@ -26,6 +28,7 @@ class PhaserDrawableSystem extends System
             @drawables[id]
                 ..x = pos.x
                 ..y = pos.y
+                ..angle = pos.rotation
 
 
 class PhaserInputSystem extends System
@@ -96,13 +99,34 @@ class TargetSystem extends System
 
 
 class PhaserFollowMouseSystem extends System
+    history: {}
+
     -> @need([CPosition, CPhaserFollowMouse])
+
+    onEntityAdded: (entity) ->
+        pos = entity.get CPosition
+        @history[entity.id] = [[pos.x, pos.y]]
 
     loop: ->
         for id, entity of @entities
             pos = entity.get CPosition
+
+            # ROTATION
+            dx = game.input.mousePointer.x - @history[id][0][0];
+            dy = game.input.mousePointer.y - @history[id][0][1];
+            d = Math.sqrt(dx ** 2 + dy ** 2)
+            if d > 0
+                v = [dx / d, dy / d]
+                pos.rotation = Math.atan2(v[1], v[0]) * 180 / Math.PI
+
+            # TRANSLATION
             pos.x = game.input.mousePointer.x;
             pos.y = game.input.mousePointer.y;
+
+            # CACHE FOR PROPER ROTATION
+            @history[id]
+                if d > 5 then ..push [pos.x, pos.y]
+                if ..length > 10 then ..shift!
 
 
 export PhaserDrawableSystem

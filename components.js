@@ -53,6 +53,13 @@ var _root = dcodeIO.ProtoBuf.newBuilder().import({
                     "name": "y",
                     "id": 2,
                     "options": {}
+                },
+                {
+                    "rule": "required",
+                    "type": "int32",
+                    "name": "rotation",
+                    "id": 3,
+                    "options": {}
                 }
             ],
             "enums": [],

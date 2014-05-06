@@ -21,7 +21,8 @@
       }
       if (drawable.type === CDrawable.Type.IMAGE) {
         sprite = game.add.sprite(0, 0, drawable.image_name);
-        return this.drawables[entity.id] = sprite;
+        this.drawables[entity.id] = sprite;
+        return sprite.anchor.setTo(0.5, 0.5);
       }
     };
     prototype.loop = function(){
@@ -32,6 +33,7 @@
         x$ = this.drawables[id];
         x$.x = pos.x;
         x$.y = pos.y;
+        x$.angle = pos.rotation;
         results$.push(x$);
       }
       return results$;
@@ -138,16 +140,37 @@
   }(System));
   PhaserFollowMouseSystem = (function(superclass){
     var prototype = extend$((import$(PhaserFollowMouseSystem, superclass).displayName = 'PhaserFollowMouseSystem', PhaserFollowMouseSystem), superclass).prototype, constructor = PhaserFollowMouseSystem;
+    prototype.history = {};
     function PhaserFollowMouseSystem(){
       this.need([CPosition, CPhaserFollowMouse]);
     }
+    prototype.onEntityAdded = function(entity){
+      var pos;
+      pos = entity.get(CPosition);
+      return this.history[entity.id] = [[pos.x, pos.y]];
+    };
     prototype.loop = function(){
-      var id, ref$, entity, pos, results$ = [];
+      var id, ref$, entity, pos, dx, dy, d, v, x$, results$ = [];
       for (id in ref$ = this.entities) {
         entity = ref$[id];
         pos = entity.get(CPosition);
+        dx = game.input.mousePointer.x - this.history[id][0][0];
+        dy = game.input.mousePointer.y - this.history[id][0][1];
+        d = Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2));
+        if (d > 0) {
+          v = [dx / d, dy / d];
+          pos.rotation = Math.atan2(v[1], v[0]) * 180 / Math.PI;
+        }
         pos.x = game.input.mousePointer.x;
-        results$.push(pos.y = game.input.mousePointer.y);
+        pos.y = game.input.mousePointer.y;
+        x$ = this.history[id];
+        if (d > 5) {
+          x$.push([pos.x, pos.y]);
+        }
+        if (x$.length > 10) {
+          x$.shift();
+        }
+        results$.push(x$);
       }
       return results$;
     };

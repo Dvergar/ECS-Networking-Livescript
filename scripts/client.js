@@ -10,10 +10,12 @@
   out$.em = em = new EntityManager("client");
   function preload(){
     console.log('preload');
-    return game.load.image('wall', 'wall.png');
+    game.load.image('wall', 'wall.png');
+    return game.load.image('ship', 'ship.png');
   }
   function create(){
     var wall, ref$, ship;
+    game.stage.backgroundColor = '#070624';
     phaserDrawableSystem = new PhaserDrawableSystem;
     phaserInputSystem = new PhaserInputSystem;
     controllerSystem = new ControllerSystem;
@@ -25,7 +27,7 @@
     em.addComponent(wall, (ref$ = new CDrawable, ref$.image_name = "wall", ref$.type = CDrawable.Type.IMAGE, ref$));
     ship = em.createEntity();
     em.addComponent(ship, (ref$ = new CPosition, ref$.x = 100, ref$.y = 100, ref$));
-    em.addComponent(ship, (ref$ = new CDrawable, ref$.image_name = "wall", ref$.type = CDrawable.Type.IMAGE, ref$));
+    em.addComponent(ship, (ref$ = new CDrawable, ref$.image_name = "ship", ref$.type = CDrawable.Type.IMAGE, ref$));
     return em.addComponent(ship, new CPhaserFollowMouse);
   }
   function update(){
