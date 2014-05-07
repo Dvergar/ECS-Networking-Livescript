@@ -9,44 +9,54 @@ function onInput event
 
 em.registerEvent(INPUT, onInput)
 
-position = new CPosition <<<
-    x: 10
-    y: 10
+# position = new CPosition <<<
+#     x: 10
+#     y: 10
 
 
-bb = new dcodeIO.ByteBuffer
-# console.log position
-# position.decode bb, 4
-bb.writeInt8(0)
-mark = bb.offset
-posenc = position.encode!
-bb.append posenc
-bb.offset = mark + posenc.length
+# bb = new dcodeIO.ByteBuffer
+# # console.log position
+# # position.decode bb, 4
+# bb.writeInt8(0)
+# # console.log \len_ + bb.offset
+# # console.log position.encode!.length
+# mark = bb.offset
+# position.encode bb
+# console.log \e_ + bb.length
+# bb.offset = mark + 4
+# # console.log \len_ + bb.offset
+# # bb.offset = mark + posenc.length
 
-console.log bb.toColumns!
+# console.log bb.toColumns!
 
-bb.writeInt8(0)
-mark = bb.offset
-posenc = position.encode!
-bb.append posenc
-bb.offset = mark + posenc.length
+# bb.writeInt8(0)
+# console.log bb.toColumns!
+# mark = bb.offset
+# position.encode bb
+# bb.offset = mark + 4
+# # mark = bb.offset
+# # posenc = position.encode!
+# # bb.append posenc
+# # bb.offset = mark + posenc.length
 
-console.log bb.toColumns!
+# console.log bb.toColumns!
 
-bb.flip!
-console.log bb.toColumns!
-console.log \length_ + bb.length
-console.log \offset_ + bb.offset
-bb.readInt8!
-console.log bb.toColumns!
-# bb.reverse!
-# bb.BE!
-pos2 = CPosition.decode bb
+# bb.flip!
+# # console.log bb.toColumns!
+# # console.log \length_ + bb.length
+# # console.log \offset_ + bb.offset
+# bb.readInt8!
+# console.log bb.toColumns!
+# # # bb.reverse!
+# # # bb.BE!
+# pos2 = CPosition.decode bb.slice bb.offset, 4
+#     console.log ..x
+#     console.log ..y
 
-console.log bb.toColumns!
-pos2
-    console.log ..x
-    console.log ..y
+# console.log bb.toColumns!
+# pos2
+#     console.log ..x
+#     console.log ..y
 
 # player = net.createEntity!
 # net.addComponent player, new CPosition <<<
@@ -116,7 +126,7 @@ function onOpen conn
 function dummy
     console.log
 
-paddleAutoControllerSystem = new PaddleAutoControllerSystem
+# paddleAutoControllerSystem = new PaddleAutoControllerSystem
 
 setInterval  ->
     em.fixedUpdate dummy

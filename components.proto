@@ -10,7 +10,9 @@ message CPosition
 {
     required int32 x = 1;
     required int32 y = 2;
-    required int32 rotation = 3;
+    //optional int32 rotation = 3;
+    //optional int32 dx = 4 [default = 0];
+    //optional int32 dy = 5 [default = 0];
 }
 
 message CSpeed
@@ -24,7 +26,9 @@ message CDrawable
     optional int32 width = 2;
     optional int32 height = 3;
     optional int32 color = 4;
-    required Type type = 5;
+    optional int32 anchorx = 5;
+    optional int32 anchory = 6;
+    required Type type = 9;
 
     enum Type
     {
@@ -44,10 +48,12 @@ message CTargetPosition
 }
 
 
-message CPhaserFollowMouse
+message CPhaserFollowMouse {}
+message CCollidable
 {
-
+    optional bool immovable = 1 [default = false];
 }
+message CShip {}
 
 // NETWORK EVENTS
 

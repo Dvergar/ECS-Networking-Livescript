@@ -53,13 +53,6 @@ var _root = dcodeIO.ProtoBuf.newBuilder().import({
                     "name": "y",
                     "id": 2,
                     "options": {}
-                },
-                {
-                    "rule": "required",
-                    "type": "int32",
-                    "name": "rotation",
-                    "id": 3,
-                    "options": {}
                 }
             ],
             "enums": [],
@@ -115,10 +108,24 @@ var _root = dcodeIO.ProtoBuf.newBuilder().import({
                     "options": {}
                 },
                 {
+                    "rule": "optional",
+                    "type": "int32",
+                    "name": "anchorx",
+                    "id": 5,
+                    "options": {}
+                },
+                {
+                    "rule": "optional",
+                    "type": "int32",
+                    "name": "anchory",
+                    "id": 6,
+                    "options": {}
+                },
+                {
                     "rule": "required",
                     "type": "Type",
                     "name": "type",
-                    "id": 5,
+                    "id": 9,
                     "options": {}
                 }
             ],
@@ -193,6 +200,30 @@ var _root = dcodeIO.ProtoBuf.newBuilder().import({
         },
         {
             "name": "CPhaserFollowMouse",
+            "fields": [],
+            "enums": [],
+            "messages": [],
+            "options": {}
+        },
+        {
+            "name": "CCollidable",
+            "fields": [
+                {
+                    "rule": "optional",
+                    "type": "bool",
+                    "name": "immovable",
+                    "id": 1,
+                    "options": {
+                        "default": false
+                    }
+                }
+            ],
+            "enums": [],
+            "messages": [],
+            "options": {}
+        },
+        {
+            "name": "CShip",
             "fields": [],
             "enums": [],
             "messages": [],

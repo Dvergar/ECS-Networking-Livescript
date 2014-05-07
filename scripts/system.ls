@@ -10,14 +10,12 @@ class System
 
         for componentType in componentTypeList
             @code = @code .|. (1 .<<. (componentType.id))
-            
-        em.registerSystem(@)
 
     onEntityAdded: (entity) ->
-        console.log "An entity has been added but nothing has been catched"
+        console.log "An entity has been added but nothing has been caught"
 
     onEntityRemoved: (entity, component) ->
-        console.log "An entity has been removed but nothing has been catched"
+        console.log "An entity has been removed but nothing has been caught"
 
     loop: ->
 

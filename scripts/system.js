@@ -8,20 +8,20 @@
     System.ids = 0;
     prototype.code = 0;
     prototype.need = function(componentTypeList){
-      var i$, len$, componentType;
+      var i$, len$, componentType, results$ = [];
       this.id = constructor.ids++;
       this.entities = {};
       for (i$ = 0, len$ = componentTypeList.length; i$ < len$; ++i$) {
         componentType = componentTypeList[i$];
-        this.code = this.code | 1 << componentType.id;
+        results$.push(this.code = this.code | 1 << componentType.id);
       }
-      return em.registerSystem(this);
+      return results$;
     };
     prototype.onEntityAdded = function(entity){
-      return console.log("An entity has been added but nothing has been catched");
+      return console.log("An entity has been added but nothing has been caught");
     };
     prototype.onEntityRemoved = function(entity, component){
-      return console.log("An entity has been removed but nothing has been catched");
+      return console.log("An entity has been removed but nothing has been caught");
     };
     prototype.loop = function(){};
     function System(){}

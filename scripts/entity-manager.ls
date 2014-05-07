@@ -37,6 +37,7 @@ class EntityManager
 
         if side is "client" then export CLIENT = true
         if side is "server" then export SERVER = true
+        window.Moo = {}
 
     createEntity: ->
         new Entity
@@ -57,20 +58,24 @@ class EntityManager
         return component
 
     removeComponent: (entity, componentType) ->
-        console.log \removeComponent
-        for system in @systems
-            if (system.code .&. entity.code) is system.code
-                delete system.entities[entity.id]
-                system.onEntityRemoved entity
-
         entity.code = entity.code .&. ~(1 .<<. componentType.id)
         entity.components[componentType.id] = undefined
+
+        for system in @systems
+            if (system.code .&. entity.code) isnt system.code
+                delete system.entities[entity.id]
+                system.onEntityRemoved entity
 
     getComponent: (entity, componentType) ->
         entity.components[componentType.id]
 
-    registerSystem: (system) ->
+    registerSystem: (systemType) ->
+        system = new systemType
         @systems.push system
+
+        systemName = systemType.displayName
+        systemName = systemName.charAt(0).toLowerCase() + systemName.slice(1)
+        window.Moo[systemName] = system
 
     # FIXED UPDATE: move this stuff
     fps = 60fps

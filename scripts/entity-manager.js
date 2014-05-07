@@ -45,6 +45,7 @@
       if (side === "server") {
         out$.SERVER = SERVER = true;
       }
+      window.Moo = {};
     }
     prototype.createEntity = function(){
       return new Entity;
@@ -68,23 +69,28 @@
       return component;
     };
     prototype.removeComponent = function(entity, componentType){
-      var i$, ref$, len$, system;
-      console.log('removeComponent');
+      var i$, ref$, len$, system, results$ = [];
+      entity.code = entity.code & ~(1 << componentType.id);
+      entity.components[componentType.id] = undefined;
       for (i$ = 0, len$ = (ref$ = this.systems).length; i$ < len$; ++i$) {
         system = ref$[i$];
-        if ((system.code & entity.code) === system.code) {
+        if ((system.code & entity.code) !== system.code) {
           delete system.entities[entity.id];
-          system.onEntityRemoved(entity);
+          results$.push(system.onEntityRemoved(entity));
         }
       }
-      entity.code = entity.code & ~(1 << componentType.id);
-      return entity.components[componentType.id] = undefined;
+      return results$;
     };
     prototype.getComponent = function(entity, componentType){
       return entity.components[componentType.id];
     };
-    prototype.registerSystem = function(system){
-      return this.systems.push(system);
+    prototype.registerSystem = function(systemType){
+      var system, systemName;
+      system = new systemType;
+      this.systems.push(system);
+      systemName = systemType.displayName;
+      systemName = systemName.charAt(0).toLowerCase() + systemName.slice(1);
+      return window.Moo[systemName] = system;
     };
     fps = 60;
     loops = 0;
